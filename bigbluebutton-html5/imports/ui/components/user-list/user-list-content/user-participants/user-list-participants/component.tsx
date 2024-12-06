@@ -12,6 +12,7 @@ import useDeduplicatedSubscription from '/imports/ui/core/hooks/useDeduplicatedS
 import UserListParticipantsPageContainer from './page/component';
 import IntersectionWatcher from './intersection-watcher/intersectionWatcher';
 import { setLocalUserList } from '/imports/ui/core/hooks/useLoadedUserList';
+import TextInput from '/imports/ui/components/text-input/component';
 
 interface UserListParticipantsProps {
   count: number;
@@ -25,7 +26,7 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
   }>({});
   const userListRef = React.useRef<HTMLDivElement | null>(null);
   const selectedUserRef = React.useRef<HTMLElement | null>(null);
-
+  const [searchedUser, setSearchedUser] = React.useState<string>('');
   useEffect(() => {
     const keys = Object.keys(visibleUsers);
     if (keys.length > 0) {
@@ -103,16 +104,35 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
     }
   };
 
+  /**
+   * Function for preparing search term and updating corresponding state variable
+   * 
+   * @author daniel  
+   * @param searchedUserText 
+   */
+  function searchForUserInParticipantsList(searchedUserText: string) {
+    setSearchedUser(searchedUserText.trim().toLowerCase());
+  }
+
   const amountOfPages = Math.ceil(count / 50);
   return (
     (
       <Styled.UserListColumn
-      // @ts-ignore
+        // @ts-ignore
         onKeyDown={rove}
         tabIndex={0}
       >
+        <Styled.UserListItem>
+          <TextInput
+            test={'search'}
+            maxLength={128}
+            placeholder={'Search for an user...'}
+            send={searchForUserInParticipantsList}
+          />
+        </Styled.UserListItem>
         <Styled.VirtualizedList ref={userListRef}>
           {
+
             Array.from({ length: amountOfPages }).map((_, i) => {
               const isLastItem = amountOfPages === (i + 1);
               const restOfUsers = count % 50;
@@ -125,6 +145,7 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
                     isLastItem={isLastItem}
                     restOfUsers={isLastItem ? restOfUsers : 50}
                     setVisibleUsers={setVisibleUsers}
+                    searchedUser={searchedUser}
                   />
                 )
                 : (
@@ -141,6 +162,7 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
                       isLastItem={isLastItem}
                       restOfUsers={isLastItem ? restOfUsers : 50}
                       setVisibleUsers={setVisibleUsers}
+                      searchedUser={searchedUser}
                     />
                   </IntersectionWatcher>
                 );
