@@ -12,7 +12,6 @@ import useDeduplicatedSubscription from '/imports/ui/core/hooks/useDeduplicatedS
 import UserListParticipantsPageContainer from './page/component';
 import IntersectionWatcher from './intersection-watcher/intersectionWatcher';
 import { setLocalUserList } from '/imports/ui/core/hooks/useLoadedUserList';
-import TextInput from '/imports/ui/components/text-input/component';
 
 interface UserListParticipantsProps {
   count: number;
@@ -24,6 +23,7 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
   const [visibleUsers, setVisibleUsers] = React.useState<{
     [key: number]: User[];
   }>({});
+  const [searchFieldValue, setSearchFieldValue] = React.useState<string>("")
   const userListRef = React.useRef<HTMLDivElement | null>(null);
   const selectedUserRef = React.useRef<HTMLElement | null>(null);
   const [searchedUser, setSearchedUser] = React.useState<string>('');
@@ -110,8 +110,14 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
    * @author daniel  
    * @param searchedUserText 
    */
-  function searchForUserInParticipantsList(searchedUserText: string) {
-    setSearchedUser(searchedUserText.trim().toLowerCase());
+  function searchForUserInParticipantsList() {
+    setSearchedUser(searchFieldValue.trim().toLowerCase());
+  }
+
+  function resetUserSearch() {
+    setSearchFieldValue("");
+    // "" returns all users 
+    setSearchedUser("");
   }
 
   const amountOfPages = Math.ceil(count / 50);
@@ -123,12 +129,27 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
         tabIndex={0}
       >
         <Styled.UserListItem>
-          <TextInput
-            test={'search'}
-            maxLength={128}
-            placeholder={'Search for an user...'}
-            send={searchForUserInParticipantsList}
-          />
+          <Styled.SearchBarWrapper>
+            <Styled.SearchBar
+              type="text"
+              value={searchFieldValue}
+              onChange={e => { setSearchFieldValue(e.currentTarget.value) }}
+              placeholder="Search for a participant..."
+              onClick={resetUserSearch}
+            />
+            <Styled.SearchButton onClick={searchForUserInParticipantsList}>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                height="24px"
+                viewBox="0 0 24 24"
+                width="24px"
+                fill="#000000"
+              >
+                <path d="M0 0h24v24H0V0z" fill="none" />
+                <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zM9.5 14c-2.48 0-4.5-2.02-4.5-4.5S7.02 5 9.5 5 14 7.02 14 9.5 11.98 14 9.5 14z" />
+              </svg>
+            </Styled.SearchButton>
+          </Styled.SearchBarWrapper>
         </Styled.UserListItem>
         <Styled.VirtualizedList ref={userListRef}>
           {
