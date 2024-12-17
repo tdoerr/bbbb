@@ -108,12 +108,16 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
    * Function for preparing search term and updating corresponding state variable
    * 
    * @author daniel  
-   * @param searchedUserText 
    */
   function searchForUserInParticipantsList() {
     setSearchedUser(searchFieldValue.trim().toLowerCase());
   }
 
+  /**
+   * Resets the search to show all users 
+   * 
+   * @author daniel 
+   */
   function resetUserSearch() {
     setSearchFieldValue("");
     // "" returns all users 
