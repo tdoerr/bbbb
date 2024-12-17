@@ -103,6 +103,7 @@ export interface ComponentsFlags {
   hasPoll: boolean;
   hasScreenshare: boolean;
   hasTimer: boolean;
+  hasTimeline: boolean;
   showRemainingTime: boolean;
   hasCameraAsContent: boolean;
 }

@@ -516,6 +516,8 @@
     "app.actionsBar.actionsDropdown.layoutModal": "Layout-Einstellungen",
     "app.actionsBar.actionsDropdown.shareCameraAsContent": "Kamera als Inhalt teilen",
     "app.actionsBar.actionsDropdown.unshareCameraAsContent": "Kamera nicht mehr als Inhalt teilen",
+    "app.actionsBar.actionsDropdown.showTimeline": "Zeitleiste anzeigen",
+    "app.actionsBar.actionsDropdown.hideTimeline": "Zeitleiste verstecken",
     "app.screenshare.screenShareLabel": "Bildschirmfreigabe",
     "app.cameraAsContent.cameraAsContentLabel": "Gegenwärtige Kamera",
     "app.submenu.application.applicationSectionTitle": "Anwendung",

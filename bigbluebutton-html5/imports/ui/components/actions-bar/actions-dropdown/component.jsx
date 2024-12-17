@@ -24,6 +24,7 @@ const propTypes = {
   handleTakePresenter: PropTypes.func.isRequired,
   isTimerActive: PropTypes.bool.isRequired,
   isTimerEnabled: PropTypes.bool.isRequired,
+  isTimelineVisible: PropTypes.bool.isRequired,
   allowExternalVideo: PropTypes.bool.isRequired,
   stopExternalVideoShare: PropTypes.func.isRequired,
   isMobile: PropTypes.bool.isRequired,
@@ -114,6 +115,14 @@ const intlMessages = defineMessages({
     id: 'app.actionsBar.actionsDropdown.unshareCameraAsContent',
     description: 'Label for unshare camera as content',
   },
+  showTimeline: {
+    id: 'app.actionsBar.actionsDropdown.showTimeline',
+    description: 'Label for showing timeline',
+  },
+  hideTimeline: {
+    id: 'app.actionsBar.actionsDropdown.hideTimeline',
+    description: 'Label for hiding timeline',
+  },
 });
 
 const handlePresentationClick = () => Session.setItem('showUploadPresentationView', true);
@@ -164,6 +173,15 @@ class ActionsDropdown extends PureComponent {
     }
   }
 
+  handleTimelineClick() {
+    const { isTimelineVisible, showTimeline, hideTimeline} = this.props
+    if (!isTimelineVisible) {
+      showTimeline()
+    } else {
+      hideTimeline()
+    }
+  }
+
   getAvailableActions() {
     const {
       intl,
@@ -175,6 +193,7 @@ class ActionsDropdown extends PureComponent {
       stopExternalVideoShare,
       isTimerActive,
       isTimerEnabled,
+      isTimelineVisible,
       layoutContextDispatch,
       amIModerator,
       hasCameraAsContent,
@@ -260,6 +279,18 @@ class ActionsDropdown extends PureComponent {
           : intl.formatMessage(intlMessages.activateTimerStopwatchLabel),
         key: this.timerId,
         onClick: () => this.handleTimerClick(),
+        dataTest: 'timerStopWatchFeature',
+      });
+    }
+
+    if (amIPresenter || amIModerator) {
+      actions.push({
+        icon: 'time',
+        label: isTimelineVisible
+          ? intl.formatMessage(intlMessages.showTimeline)
+          : intl.formatMessage(intlMessages.hideTimeline),
+        key: this.timerId,
+        onClick: () => this.handleTimelineClick(),
         dataTest: 'timerStopWatchFeature',
       });
     }

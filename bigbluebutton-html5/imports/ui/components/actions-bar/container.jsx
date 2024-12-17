@@ -151,6 +151,7 @@ const ActionsBarContainer = (props) => {
         stopExternalVideoShare,
         isSharedNotesPinned,
         isTimerActive: currentMeeting.componentsFlags.hasTimer,
+        isTimelineVisible: currentMeeting.componentsFlags.hasTimer,
         isTimerEnabled: isTimerFeatureEnabled,
         hasGenericContent: isThereGenericMainContent,
         setPushLayout,

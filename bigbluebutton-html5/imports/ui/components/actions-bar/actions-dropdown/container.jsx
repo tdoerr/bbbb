@@ -16,6 +16,7 @@ import {
 import useDeduplicatedSubscription from '/imports/ui/core/hooks/useDeduplicatedSubscription';
 import { SET_PRESENTER } from '/imports/ui/core/graphql/mutations/userMutations';
 import { TIMER_ACTIVATE, TIMER_DEACTIVATE } from '../../timer/mutations';
+import { TIMELINE_SHOW, TIMELINE_HIDE } from '../../timeline/mutations';
 import Auth from '/imports/ui/services/auth';
 import { PRESENTATION_SET_CURRENT } from '../../presentation/mutations';
 import { useStorageKey } from '/imports/ui/services/storage/hooks';
@@ -56,6 +57,8 @@ const ActionsDropdownContainer = (props) => {
   const [timerActivate] = useMutation(TIMER_ACTIVATE);
   const [timerDeactivate] = useMutation(TIMER_DEACTIVATE);
   const [presentationSetCurrent] = useMutation(PRESENTATION_SET_CURRENT);
+  const [timelineShow] = useMutation(TIMELINE_SHOW);
+  const [timelineHide] = useMutation(TIMELINE_HIDE);
 
   const handleTakePresenter = () => {
     setPresenter({ variables: { userId: Auth.userID } });
@@ -86,6 +89,10 @@ const ActionsDropdownContainer = (props) => {
     }, 500);
   };
 
+  const showTimeline = () => {timelineShow()}
+
+  const hideTimeline = () => {timelineHide()}
+
   const isDropdownOpen = useStorageKey('dropdownOpen');
   const isPresentationEnabled = useIsPresentationEnabled();
   const isTimerFeatureEnabled = useIsTimerFeatureEnabled();
@@ -107,6 +114,8 @@ const ActionsDropdownContainer = (props) => {
         isCameraAsContentEnabled,
         handleTakePresenter,
         activateTimer,
+        showTimeline,
+        hideTimeline,
         deactivateTimer: timerDeactivate,
         shortcuts: openActions,
         isPresentationEnabled,
