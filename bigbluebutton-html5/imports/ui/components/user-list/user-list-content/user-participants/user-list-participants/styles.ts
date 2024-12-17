@@ -3,14 +3,22 @@ import {
   userIndicatorsOffset,
   mdPaddingY,
   indicatorPadding,
+  smPaddingY, 
+  smPaddingX, 
+  borderRadius,
+  borderSize,
 } from '/imports/ui/stylesheets/styled-components/general';
+import { fontSizeBase } from '/imports/ui/stylesheets/styled-components/typography';
 import {
   colorPrimary,
   colorWhite,
   userListBg,
   colorSuccess,
+  colorGrayLighter,
   colorDanger,
   colorOffWhite,
+  colorBlueLight, 
+  colorText
 } from '/imports/ui/stylesheets/styled-components/palette';
 
 import {
@@ -273,6 +281,56 @@ const VirtualizedList = styled(ScrollboxVertical)`
 const UserListItem = styled.div`
   padding: .25em 0;
   margin-left: .5rem;
+  padding-right: ${smPaddingY}; 
+`;
+
+const SearchBarWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+`;
+
+const SearchBar = styled.input`
+  font-size: 0.9rem;
+  padding: ${smPaddingY} ${smPaddingX};
+  padding-right: 40px;  
+  width: 100%;
+  border-radius: ${borderRadius};
+  font-size: ${fontSizeBase};
+  border: 1px solid ${colorGrayLighter};
+  color: ${colorText};
+  box-sizing: border-box;
+  outline: none;
+  transition: box-shadow 0.3s ease, border 0.3s ease;
+
+  &:focus {
+    border-color: ${colorBlueLight};
+    box-shadow: 0 0 0 ${borderSize} ${colorBlueLight}, inset 0 0 0 1px ${colorPrimary};
+  }
+
+  &::placeholder {
+    color: ${colorGrayLighter};
+  }
+`;
+
+const SearchButton = styled.button`
+  padding-top: ${smPaddingY}; 
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.7;
+  }
+  svg {
+    fill: ${colorText}; 
+  }
 `;
 
 export default {
@@ -281,4 +339,7 @@ export default {
   UserListColumn,
   VirtualizedList,
   UserListItem,
+  SearchBarWrapper, 
+  SearchBar, 
+  SearchButton
 };
