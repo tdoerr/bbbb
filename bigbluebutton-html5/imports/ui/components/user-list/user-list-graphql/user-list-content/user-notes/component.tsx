@@ -3,7 +3,7 @@ import { defineMessages, useIntl } from 'react-intl';
 import Icon from '/imports/ui/components/common/icon/component';
 import NotesService from '/imports/ui/components/notes/service';
 import lockContextContainer from '/imports/ui/components/lock-viewers/context/container';
-import { PANELS } from '/imports/ui/components/layout/enums';
+import { PANELS, ACTIONS } from '/imports/ui/components/layout/enums';
 import { notify } from '/imports/ui/services/notification';
 import { layoutSelectInput, layoutDispatch } from '/imports/ui/components/layout/context';
 import {
@@ -126,52 +126,119 @@ const UserNotesGraphql: React.FC<UserNotesGraphqlProps> = (props) => {
       );
     }
 
+
+
+
+
+    const handleClickTooglePrivateNotes = () => {
+      layoutContextDispatch({
+        type: ACTIONS.SET_PRIVATE_NOTES_WINDOW_OPEN,
+        value: true,
+      });
+    };
+
+
+
+
     const showTitle = isPinned ? intl.formatMessage(intlMessages.sharedNotesPinned)
       : intl.formatMessage(intlMessages.sharedNotes);
     return (
-      // @ts-ignore
-      <Styled.ListItem
-        aria-label={showTitle}
-        aria-describedby="lockedNotes"
-        role="button"
-        tabIndex={0}
-        active={notesOpen}
-        data-test="sharedNotesButton"
-        onClick={() => toggleNotesPanel(sidebarContentPanel, layoutContextDispatch)}
-        // @ts-ignore
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') {
-            toggleNotesPanel(sidebarContentPanel, layoutContextDispatch);
-          }
-        }}
-        as={isPinned ? 'button' : 'div'}
-        disabled={isPinned}
-        $disabled={isPinned}
-      >
+      <>
         {/* @ts-ignore */}
-        <Icon iconName="copy" />
-        <div aria-hidden>
-          <Styled.NotesTitle data-test="sharedNotes">
-            { showTitle }
-          </Styled.NotesTitle>
-          {disableNotes
-            ? (
-              <Styled.NotesLock>
-                {/* @ts-ignore */}
-                <span id="lockedNotes">
-                  <Icon iconName="lock" />
-                  &nbsp;
-                  {`${intl.formatMessage(intlMessages.locked)} ${intl.formatMessage(intlMessages.byModerator)}`}
-                </span>
-              </Styled.NotesLock>
-            ) : null}
-          {isPinned
-            ? (
-              <span className="sr-only">{`${intl.formatMessage(intlMessages.disabled)}`}</span>
-            ) : null}
-        </div>
-        {notification}
-      </Styled.ListItem>
+        <Styled.ListItem
+          aria-label={showTitle}
+          aria-describedby="lockedNotes"
+          role="button"
+          tabIndex={0}
+          active={notesOpen}
+          data-test="sharedNotesButton"
+          onClick={() => toggleNotesPanel(sidebarContentPanel, layoutContextDispatch)}
+          // @ts-ignore
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              toggleNotesPanel(sidebarContentPanel, layoutContextDispatch);
+            }
+          }}
+          as={isPinned ? 'button' : 'div'}
+          disabled={isPinned}
+          $disabled={isPinned}
+        >
+          {/* @ts-ignore */}
+          <Icon iconName="copy" />
+          <div aria-hidden>
+            <Styled.NotesTitle data-test="sharedNotes">
+              {showTitle}
+            </Styled.NotesTitle>
+            {disableNotes
+              ? (
+                <Styled.NotesLock>
+                  {/* @ts-ignore */}
+                  <span id="lockedNotes">
+                    <Icon iconName="lock" />
+                    &nbsp;
+                    {`${intl.formatMessage(intlMessages.locked)} ${intl.formatMessage(intlMessages.byModerator)}`}
+                  </span>
+                </Styled.NotesLock>
+              ) : null}
+            {isPinned
+              ? (
+                <span className="sr-only">{`${intl.formatMessage(intlMessages.disabled)}`}</span>
+              ) : null}
+          </div>
+          {notification}
+        </Styled.ListItem>
+
+        {/* @ts-ignore */}
+        <Styled.ListItem
+          aria-label={showTitle}
+          aria-describedby="lockedNotes"
+          role="button"
+          tabIndex={0}
+          active={false}
+          data-test="sharedNotesButton"
+          onClick={() => {
+            layoutContextDispatch({
+              type: ACTIONS.SET_SIDEBAR_CONTENT_PANEL,
+              value: PANELS.PRIVATE_NOTES,
+            });
+
+          }}
+
+          // @ts-ignore
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              toggleNotesPanel(sidebarContentPanel, layoutContextDispatch);
+            }
+          }}
+          as={isPinned ? 'button' : 'div'}
+          disabled={isPinned}
+          $disabled={isPinned}
+        >
+          {/* @ts-ignore */}
+          <Icon iconName="lock" />
+          <div aria-hidden>
+            <Styled.NotesTitle data-test="sharedNotes">
+              {"Private notes"}
+            </Styled.NotesTitle>
+            {disableNotes
+              ? (
+                <Styled.NotesLock>
+                  {/* @ts-ignore */}
+                  <span id="lockedNotes">
+                    <Icon iconName="lock" />
+                    &nbsp;
+                    {`${intl.formatMessage(intlMessages.locked)} ${intl.formatMessage(intlMessages.byModerator)}`}
+                  </span>
+                </Styled.NotesLock>
+              ) : null}
+            {isPinned
+              ? (
+                <span className="sr-only">{`${intl.formatMessage(intlMessages.disabled)}`}</span>
+              ) : null}
+          </div>
+          {notification}
+        </Styled.ListItem>
+      </>
     );
   };
 

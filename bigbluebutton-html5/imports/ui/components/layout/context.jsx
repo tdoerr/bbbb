@@ -13,6 +13,7 @@ import { useIsPresentationEnabled } from '/imports/ui/services/features';
 import useDeduplicatedSubscription from '../../core/hooks/useDeduplicatedSubscription';
 import { usePrevious } from '../whiteboard/utils';
 import Session from '/imports/ui/services/storage/in-memory';
+import PrivatNotes from '/imports/ui/components/notes/private-notes/PrivateNotes'
 
 // variable to debug in console log
 const debug = false;
@@ -55,7 +56,12 @@ const initState = {
     element: '',
     group: '',
   },
-  input: INITIAL_INPUT_STATE,
+  input: {
+    ...INITIAL_INPUT_STATE,
+    privateNotes: {
+      isOpen: false, // Initialer Wert für privateNotes
+    },
+  },
   output: INITIAL_OUTPUT_STATE,
 };
 
@@ -1372,6 +1378,24 @@ const reducer = (state, action) => {
         presentationAreaContentActions,
       };
     }
+
+
+    case ACTIONS.SET_PRIVATE_NOTES_WINDOW_OPEN: {
+      const { privateNotes } = state.input;
+      if (privateNotes.isOpen === action.value) return state;
+
+      return {
+        ...state,
+        input: {
+          ...state.input,
+          privateNotes: {
+            ...privateNotes,
+            isOpen: action.value,
+          },
+        },
+      };
+    }
+
     default: {
       throw new Error('Unexpected action');
     }
@@ -1569,6 +1593,7 @@ const LayoutContextProvider = (props) => {
     }
     >
       {children}
+      <PrivatNotes />
     </LayoutContextSelector.Provider>
   );
 };

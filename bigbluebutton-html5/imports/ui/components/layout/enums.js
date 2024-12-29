@@ -133,6 +133,7 @@ export const ACTIONS = {
   SET_NOTES_IS_PINNED: 'setNotesIsPinned',
 
   SET_PILE_CONTENT_FOR_PRESENTATION_AREA: 'setPileContentForPresentationArea',
+  SET_PRIVATE_NOTES_WINDOW_OPEN: 'setPrivateNotesWindowOpen' 
 };
 
 export const PRESENTATION_AREA = {
@@ -154,4 +155,5 @@ export const PANELS = {
   WAITING_USERS: 'waiting-users',
   GENERIC_CONTENT_SIDEKICK: 'generic-content-sidekick',
   NONE: 'none',
+  PRIVATE_NOTES: 'private-notes'
 };

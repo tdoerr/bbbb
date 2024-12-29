@@ -1,6 +1,9 @@
 import DEFAULT_VALUES from '/imports/ui/components/layout/defaultValues';
 
 export const INITIAL_INPUT_STATE = {
+  privateNotes: {
+    isOpen: false,
+  },
   autoarrAngeLayout: true,
   userMetadata: {
 

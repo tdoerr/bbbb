@@ -41,7 +41,7 @@ const intlMessages = defineMessages({
 });
 
 interface StartPollButtonProps {
-  optList: Array<{val: string}>;
+  optList: Array<{ val: string }>;
   question: string | string[];
   type: string | null;
   setError: (err: string) => void;
@@ -50,6 +50,30 @@ interface StartPollButtonProps {
   isMultipleResponse: boolean;
   hasCurrentPresentation: boolean;
 }
+
+export const startPoll = (
+  pollType: string | null,
+  secretPoll: boolean,
+  question: string | string[],
+  isMultipleResponse: boolean,
+  createPoll: any,
+  hasCurrentPresentation: any,
+  PUBLIC_CHAT_KEY: any,
+  answers: (string | null)[] = []
+) => {
+  const pollId = hasCurrentPresentation || PUBLIC_CHAT_KEY;
+
+  createPoll({
+    variables: {
+      pollType,
+      pollId: `${pollId}/${new Date().getTime()}`,
+      secretPoll,
+      question,
+      isMultipleResponse,
+      answers,
+    },
+  });
+};
 
 const StartPollButton: React.FC<StartPollButtonProps> = ({
   optList,
@@ -70,26 +94,7 @@ const StartPollButton: React.FC<StartPollButtonProps> = ({
 
   const [createPoll] = useMutation(POLL_CREATE);
 
-  const startPoll = (
-    pollType: string | null,
-    secretPoll: boolean,
-    question: string | string[],
-    isMultipleResponse: boolean,
-    answers: (string | null)[] = [],
-  ) => {
-    const pollId = hasCurrentPresentation || PUBLIC_CHAT_KEY;
 
-    createPoll({
-      variables: {
-        pollType,
-        pollId: `${pollId}/${new Date().getTime()}`,
-        secretPoll,
-        question,
-        isMultipleResponse,
-        answers,
-      },
-    });
-  };
 
   return (
     <Styled.StartPollBtn
@@ -134,10 +139,13 @@ const StartPollButton: React.FC<StartPollButtonProps> = ({
               secretPoll,
               question,
               isMultipleResponse,
+              createPoll,
+              hasCurrentPresentation,
+              PUBLIC_CHAT_KEY,
               verifiedOptions?.filter(Boolean),
             );
           } else {
-            startPoll(verifiedPollType, secretPoll, question, isMultipleResponse);
+            startPoll(verifiedPollType, secretPoll, question, isMultipleResponse, createPoll, hasCurrentPresentation, PUBLIC_CHAT_KEY);
           }
         }
       }}
