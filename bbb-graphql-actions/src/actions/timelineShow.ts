@@ -13,7 +13,7 @@ export default function buildRedisMessage(sessionVariables: Record<string, unkno
 
   const header = {
     name: eventName,
-    metingId: routing.meetingId,
+    meetingId: routing.meetingId,
     userId: routing.userId
   }
 

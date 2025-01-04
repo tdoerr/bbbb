@@ -513,6 +513,14 @@ type Mutation {
 }
 
 type Mutation {
+  timelineShow: Boolean
+}
+
+type Mutation {
+  timelineHide: Boolean
+}
+
+type Mutation {
   userEjectCameras(
     userId: String!
   ): Boolean
