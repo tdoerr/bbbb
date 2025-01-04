@@ -1738,6 +1738,21 @@ SELECT
  FROM "timer";
 
 ------------------------------------
+----Timeline
+CREATE TABLE "timeline" (
+	"meetingId" varchar(100) PRIMARY KEY REFERENCES "meeting"("meetingId") ON DELETE CASCADE,
+	"active" boolean
+);
+
+CREATE TABLE "timeline_event" (
+	"eventId" varchar(100),
+	"meetingId" varchar(100),
+	"type" varchar(32),
+	CONSTRAINT "timeline_event_pkey" PRIMARY KEY ("eventId", "meetingId"),
+	FOREIGN KEY ("meetingId") REFERENCES "meeting"("meetingId") ON DELETE CASCADE
+);
+
+------------------------------------
 ----breakoutRoom
 
 
