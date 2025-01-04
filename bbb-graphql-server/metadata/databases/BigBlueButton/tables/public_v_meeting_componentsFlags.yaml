@@ -17,6 +17,7 @@ select_permissions:
         - hasScreenshare
         - hasCameraAsContent
         - hasTimer
+        - hasTimeline
         - showRemainingTime
       filter:
         meetingId:

@@ -108,6 +108,8 @@
     "app.timer.track1": "Relaxing",
     "app.timer.track2": "Calm",
     "app.timer.track3": "Happy",
+    "app.timeline.title": "Timeline",
+    "app.timeline.hideTimelineLabel": "Hide timeline",
     "app.captions.label": "Captions",
     "app.captions.menu.close": "Close",
     "app.captions.menu.start": "Start",

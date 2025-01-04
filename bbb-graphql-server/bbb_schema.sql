@@ -2232,6 +2232,12 @@ select "meeting"."meetingId",
         ) as "hasTimer",
         exists (
             select 1
+            from "timeline"
+            where "timeline"."meetingId" = "meeting"."meetingId"
+            and "active" is true
+        ) as "hasTimeline",
+        exists (
+            select 1
             from "v_screenshare"
             where "v_screenshare"."meetingId" = "meeting"."meetingId"
             and "contentType" = 'screenshare'

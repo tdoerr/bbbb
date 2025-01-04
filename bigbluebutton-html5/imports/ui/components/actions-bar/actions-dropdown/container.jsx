@@ -89,9 +89,22 @@ const ActionsDropdownContainer = (props) => {
     }, 500);
   };
 
-  const showTimeline = () => {timelineShow()}
+  const showTimeline = () => {
+    timelineShow()
 
-  const hideTimeline = () => {timelineHide()}
+    setTimeout(() => {
+      layoutContextDispatch({
+        type: ACTIONS.SET_SIDEBAR_CONTENT_IS_OPEN,
+        value: true
+      })
+      layoutContextDispatch({
+        type: ACTIONS.SET_SIDEBAR_CONTENT_PANEL,
+        value: PANELS.TIMELINE
+      })
+    })
+  }
+
+  const hideTimeline = () => { timelineHide() }
 
   const isDropdownOpen = useStorageKey('dropdownOpen');
   const isPresentationEnabled = useIsPresentationEnabled();

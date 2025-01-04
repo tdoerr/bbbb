@@ -151,6 +151,7 @@ export const PANELS = {
   BREAKOUT: 'breakoutroom',
   SHARED_NOTES: 'shared-notes',
   TIMER: 'timer',
+  TIMELINE: 'timeline',
   WAITING_USERS: 'waiting-users',
   GENERIC_CONTENT_SIDEKICK: 'generic-content-sidekick',
   NONE: 'none',

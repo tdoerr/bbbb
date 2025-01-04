@@ -7,6 +7,7 @@ import NotesContainer from '/imports/ui/components/notes/component';
 import PollContainer from '/imports/ui/components/poll/container';
 import BreakoutRoomContainer from '../breakout-room/breakout-room/component';
 import TimerContainer from '/imports/ui/components/timer/panel/component';
+import TimelineContainer from '/imports/ui/components/timeline/panel/component';
 import GuestUsersManagementPanel from '/imports/ui/components/waiting-users/waiting-users-graphql/component';
 import Styled from './styles';
 import ErrorBoundary from '/imports/ui/components/common/error-boundary/component';
@@ -150,6 +151,7 @@ const SidebarContent = (props) => {
       )}
       {sidebarContentPanel === PANELS.BREAKOUT && <BreakoutRoomContainer />}
       {sidebarContentPanel === PANELS.TIMER && <TimerContainer isModerator={amIModerator} />}
+      {sidebarContentPanel === PANELS.TIMELINE && <TimelineContainer/>}
       {sidebarContentPanel === PANELS.WAITING_USERS && <GuestUsersManagementPanel />}
       {sidebarContentPanel === PANELS.POLL && (
         <Styled.Poll

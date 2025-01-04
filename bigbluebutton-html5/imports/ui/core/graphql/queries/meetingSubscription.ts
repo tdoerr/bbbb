@@ -123,6 +123,7 @@ const MEETING_SUBSCRIPTION = gql`
           hasPoll
           hasScreenshare
           hasTimer
+          hasTimeline
           showRemainingTime
           hasCameraAsContent
         }
