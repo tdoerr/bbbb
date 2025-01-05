@@ -13,6 +13,7 @@ class LiveMeeting(
     val screenshareModel:    ScreenshareModel,
     val audioCaptions:       AudioCaptions,
     val timerModel:          TimerModel,
+    val timelineModel:       TimelineModel,
     val chatModel:           ChatModel,
     val externalVideoModel:  ExternalVideoModel,
     val layouts:             Layouts,

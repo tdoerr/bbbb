@@ -24,7 +24,7 @@ const propTypes = {
   handleTakePresenter: PropTypes.func.isRequired,
   isTimerActive: PropTypes.bool.isRequired,
   isTimerEnabled: PropTypes.bool.isRequired,
-  isTimelineVisible: PropTypes.bool.isRequired,
+  isTimelineActive: PropTypes.bool.isRequired,
   allowExternalVideo: PropTypes.bool.isRequired,
   stopExternalVideoShare: PropTypes.func.isRequired,
   isMobile: PropTypes.bool.isRequired,
@@ -115,12 +115,12 @@ const intlMessages = defineMessages({
     id: 'app.actionsBar.actionsDropdown.unshareCameraAsContent',
     description: 'Label for unshare camera as content',
   },
-  showTimeline: {
-    id: 'app.actionsBar.actionsDropdown.showTimeline',
+  activateTimeline: {
+    id: 'app.actionsBar.actionsDropdown.activateTimeline',
     description: 'Label for showing timeline',
   },
-  hideTimeline: {
-    id: 'app.actionsBar.actionsDropdown.hideTimeline',
+  deactivateTimeline: {
+    id: 'app.actionsBar.actionsDropdown.deactivateTimeline',
     description: 'Label for hiding timeline',
   },
 });
@@ -174,11 +174,11 @@ class ActionsDropdown extends PureComponent {
   }
 
   handleTimelineClick() {
-    const { isTimelineVisible, showTimeline, hideTimeline} = this.props
-    if (!isTimelineVisible) {
-      showTimeline()
+    const { isTimelineActive, activateTimeline, deactivateTimeline} = this.props
+    if (!isTimelineActive) {
+      activateTimeline()
     } else {
-      hideTimeline()
+      deactivateTimeline()
     }
   }
 
@@ -193,7 +193,7 @@ class ActionsDropdown extends PureComponent {
       stopExternalVideoShare,
       isTimerActive,
       isTimerEnabled,
-      isTimelineVisible,
+      isTimelineActive,
       layoutContextDispatch,
       amIModerator,
       hasCameraAsContent,
@@ -286,9 +286,9 @@ class ActionsDropdown extends PureComponent {
     if (amIPresenter || amIModerator) {
       actions.push({
         icon: 'time',
-        label: isTimelineVisible
-          ? intl.formatMessage(intlMessages.showTimeline)
-          : intl.formatMessage(intlMessages.hideTimeline),
+        label: isTimelineActive
+          ? intl.formatMessage(intlMessages.deactivateTimeline)
+          : intl.formatMessage(intlMessages.activateTimeline),
         key: this.timerId,
         onClick: () => this.handleTimelineClick(),
         dataTest: 'timerStopWatchFeature',

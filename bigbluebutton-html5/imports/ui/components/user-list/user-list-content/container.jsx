@@ -34,6 +34,7 @@ const UserContentContainer = (props) => {
         isGuestLobbyMessageEnabled: APP_SETTINGS.enableGuestLobbyMessage,
         currentUser,
         isTimerActive: currentMeeting?.componentsFlags?.hasTimer && currentUser?.isModerator,
+        isTimelineActive: currentMeeting?.componentsFlags?.hasTimeline && currentUser?.isModerator,
         isWaitingRoomEnabled,
         isChatEnabled,
         ...props,

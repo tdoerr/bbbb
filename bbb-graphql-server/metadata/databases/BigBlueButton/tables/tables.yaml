@@ -46,6 +46,7 @@
 - "!include public_v_sharedNotes_diff.yaml"
 - "!include public_v_sharedNotes_session.yaml"
 - "!include public_v_timer.yaml"
+- "!include public_v_timeline.yaml"
 - "!include public_v_user.yaml"
 - "!include public_v_user_breakoutRoom.yaml"
 - "!include public_v_user_camera.yaml"

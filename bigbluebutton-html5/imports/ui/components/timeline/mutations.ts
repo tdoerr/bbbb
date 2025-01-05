@@ -1,18 +1,18 @@
 import { gql } from '@apollo/client';
 
-export const TIMELINE_SHOW = gql`
-  mutation timelineShow {
-    timelineShow
+export const TIMELINE_ACTIVATE = gql`
+  mutation timelineActivate{
+    timelineActivate
   }
 `;
 
-export const TIMELINE_HIDE = gql`
-  mutation timelineHide {
-    timelineHide
+export const TIMELINE_DEACTIVATE = gql`
+  mutation timelineDeactivate{
+    timelineDeactivate
   }
 `;
 
 export default {
-  TIMELINE_SHOW,
-  TIMELINE_HIDE
+  TIMELINE_ACTIVATE,
+  TIMELINE_DEACTIVATE
 }

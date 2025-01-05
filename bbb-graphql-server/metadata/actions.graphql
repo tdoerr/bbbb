@@ -513,11 +513,11 @@ type Mutation {
 }
 
 type Mutation {
-  timelineShow: Boolean
+  timelineActivate: Boolean
 }
 
 type Mutation {
-  timelineHide: Boolean
+  timelineDeactivate: Boolean
 }
 
 type Mutation {

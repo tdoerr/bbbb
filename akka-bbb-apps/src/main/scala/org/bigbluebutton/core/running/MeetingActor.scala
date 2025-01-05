@@ -19,6 +19,7 @@ import org.bigbluebutton.core.apps.pads.{ PadsApp2x, PadslHdlrHelpers }
 import org.bigbluebutton.core.apps.screenshare.ScreenshareApp2x
 import org.bigbluebutton.core.apps.audiocaptions.AudioCaptionsApp2x
 import org.bigbluebutton.core.apps.timer.TimerApp2x
+import org.bigbluebutton.core.apps.timeline.TimelineApp3x
 import org.bigbluebutton.core.apps.presentation.PresentationApp2x
 import org.bigbluebutton.core.apps.users.UsersApp2x
 import org.bigbluebutton.core.apps.webcam.WebcamApp2x
@@ -41,7 +42,7 @@ import scala.concurrent.duration._
 import org.bigbluebutton.core.apps.layout.LayoutApp2x
 import org.bigbluebutton.core.apps.plugin.PluginHdlrs
 import org.bigbluebutton.core.apps.users.ChangeLockSettingsInMeetingCmdMsgHdlr
-import org.bigbluebutton.core.db.{ MeetingDAO, NotificationDAO, TimerDAO, UserStateDAO }
+import org.bigbluebutton.core.db.{ MeetingDAO, NotificationDAO, TimerDAO, TimelineDAO, UserStateDAO }
 import org.bigbluebutton.core.graphql.GraphqlMiddleware
 import org.bigbluebutton.core.models.VoiceUsers.{ findAllFreeswitchCallers, findAllListenOnlyVoiceUsers }
 import org.bigbluebutton.core.models.Webcams.findAll
@@ -135,6 +136,7 @@ class MeetingActor(
   val webcamApp2x = new WebcamApp2x
   val wbApp = new WhiteboardApp2x
   val timerApp2x = new TimerApp2x
+  val timelineApp3x = new TimelineApp3x
   val pluginHdlrs = new PluginHdlrs
 
   object ExpiryTrackerHelper extends MeetingExpiryTrackerHelper
@@ -205,6 +207,7 @@ class MeetingActor(
 
   initSharedNotes(liveMeeting)
   initTimer(liveMeeting)
+  initTimeline(liveMeeting)
 
   /** *****************************************************************/
   // Helper to create fake users for testing (ralam jan 5, 2018)
@@ -353,6 +356,10 @@ class MeetingActor(
       TimerModel.createTimer(liveMeeting.timerModel, time = timerDefaultTimeInMilli)
       TimerDAO.insert(liveMeeting.props.meetingProp.intId, liveMeeting.timerModel)
     }
+  }
+
+  private def initTimeline(liveMeeting: LiveMeeting): Unit = {
+    TimelineDAO.insert(liveMeeting.props.meetingProp.intId, liveMeeting.timelineModel)
   }
 
   private def updateVoiceUserLastActivity(userId: String) {
@@ -787,6 +794,11 @@ class MeetingActor(
         updateUserLastActivity(m.header.userId)
       case m: SetTrackReqMsg =>
         timerApp2x.handle(m, liveMeeting, msgBus)
+        updateUserLastActivity(m.header.userId)
+
+      //Timeline
+      case m: ActivateTimelineReqMsg =>
+        timelineApp3x.handle(m, liveMeeting, msgBus)
         updateUserLastActivity(m.header.userId)
 
       case m: UserActivitySignCmdMsg => handleUserActivitySignCmdMsg(m)

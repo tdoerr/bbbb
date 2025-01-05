@@ -1744,6 +1744,12 @@ CREATE TABLE "timeline" (
 	"active" boolean
 );
 
+CREATE OR REPLACE VIEW "v_timeline" AS
+SELECT
+     "meetingId",
+     "active"
+ FROM "timeline";
+
 CREATE TABLE "timeline_event" (
 	"eventId" varchar(100),
 	"meetingId" varchar(100),

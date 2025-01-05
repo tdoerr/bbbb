@@ -4,7 +4,7 @@ import {throwErrorIfNotModerator} from '../imports/validation'
 export default function buildRedisMessage(sessionVariables: Record<string, unknown>, input: Record<string, unknown>): RedisMessage {
   throwErrorIfNotModerator(sessionVariables)
 
-  const eventName = `ShowTimelineReqMsg`
+  const eventName = `ActivateTimelineReqMsg`
 
   const routing = {
     meetingId: sessionVariables['x-hasura-meetingid'] as String,

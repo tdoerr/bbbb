@@ -22,8 +22,8 @@ import { ACTIONS, PANELS } from '../../layout/enums';
 // const MILLI_IN_SECOND = 1000;
 
 const intlMessages = defineMessages({
-  hideTimelineLabel: {
-    id: 'app.timeline.hideTimelineLabel',
+  deactivateTimelineLabel: {
+    id: 'app.timeline.deactivateTimelineLabel',
     description: 'Label for hiding timeline button'
   },
   timeline: {
@@ -61,8 +61,8 @@ const TimelinePanel = ({
       <Header
         leftButtonProps={{
           onClick: closePanel,
-          'aria-label': intl.formatMessage(intlMessages.hideTimelineLabel),
-          label: intl.formatMessage(intlMessages.hideTimelineLabel),
+          'aria-label': intl.formatMessage(intlMessages.deactivateTimelineLabel),
+          label: intl.formatMessage(intlMessages.deactivateTimelineLabel),
         }}
       data-test="timelineHeader"
       />

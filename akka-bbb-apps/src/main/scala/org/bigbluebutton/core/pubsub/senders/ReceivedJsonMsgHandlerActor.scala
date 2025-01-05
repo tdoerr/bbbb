@@ -477,6 +477,10 @@ class ReceivedJsonMsgHandlerActor(
       case SetTrackReqMsg.NAME =>
         routeGenericMsg[SetTrackReqMsg](envelope, jsonNode)
 
+      // Timeline
+      case ActivateTimelineReqMsg.NAME =>
+        routeGenericMsg[ActivateTimelineReqMsg](envelope, jsonNode)
+
       // Messages from Graphql Middleware
       case UserGraphqlConnectionEstablishedSysMsg.NAME =>
         route[UserGraphqlConnectionEstablishedSysMsg](meetingManagerChannel, envelope, jsonNode)

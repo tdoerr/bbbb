@@ -147,6 +147,9 @@ class RedisRecorderActor(
       case m: TimerEndedEvtMsg                      => handleTimerEndedEvtMsg(m)
       case m: SetTrackRespMsg                       => handleSetTrackRespMsg(m)
 
+      // Timeline
+      case m: ActivateTimelineRespMsg               => handleActivateTimelineRespMsg(m)
+
       case _                                        => // message not to be recorded.
     }
   }
@@ -650,6 +653,10 @@ class RedisRecorderActor(
     ev.setMeetingId(msg.header.meetingId)
 
     record(msg.header.meetingId, ev.toMap.asJava)
+  }
+
+  private def handleActivateTimelineRespMsg(msg: ActivateTimelineRespMsg) {
+    //TODO: Implement recording logic
   }
 
   private def handleSetTrackRespMsg(msg: SetTrackRespMsg) {
