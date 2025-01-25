@@ -13,6 +13,8 @@ import { getSettingsSingletonInstance } from '/imports/ui/services/settings';
 import { LAYOUT_TYPE } from '../layout/enums';
 import ReactionsButtonContainer from '/imports/ui/components/actions-bar/reactions-button/container';
 import RaiseHandButtonContainer from '/imports/ui/components/actions-bar/raise-hand-button/container';
+import ProgressBarTimeline from './timeline/component'
+import { height } from '@mui/system';
 
 const intlMessages = defineMessages({
   actionsBarLabel: {
@@ -117,91 +119,102 @@ class ActionsBar extends PureComponent {
     const shouldShowOptionsButton = (isPresentationEnabled && isThereCurrentPresentation)
       || isSharingVideo || hasScreenshare || isSharedNotesPinned;
 
+    const handleMarkerReached = (marker) => {
+      console.log(`Marker erreicht: ${marker} Sekunden`);
+
+    };
+
+    const handleComplete = () => {
+      console.log('Time is up!');
+    };
     return (
-      <Styled.ActionsBarWrapper
-        id="ActionsBar"
-        role="region"
-        aria-label={intl.formatMessage(intlMessages.actionsBarLabel)}
-        aria-hidden={ariaHidden}
-        style={
-          {
+      <>
+        <Styled.ActionsBarWrapper
+          id="ActionsBar"
+          role="region"
+          aria-label={intl.formatMessage(intlMessages.actionsBarLabel)}
+          aria-hidden={ariaHidden}
+          style={{
             position: 'absolute',
-            top: actionsBarStyle.top,
+            top: actionsBarStyle.top - 70,
             left: actionsBarStyle.left,
             height: actionsBarStyle.height,
             width: actionsBarStyle.width,
             padding: actionsBarStyle.padding,
-          }
-        }
-      >
-        <Styled.ActionsBar
-          ref={this.actionsBarRef}
-          style={
-            {
-              height: actionsBarStyle.innerHeight,
-            }
-          }
+          }}
         >
-          <Styled.Left>
-            <ActionsDropdown {...{
-              amIPresenter,
-              amIModerator,
-              isPollingEnabled,
-              allowExternalVideo,
-              intl,
-              isSharingVideo,
-              stopExternalVideoShare,
-              isTimerActive,
-              isTimerEnabled,
-              isMeteorConnected,
-              setMeetingLayout,
-              setPushLayout,
-              presentationIsOpen,
-              showPushLayout,
-              hasCameraAsContent,
-              setPresentationFitToWidth,
-            }}
-            />
-          </Styled.Left>
-          <Styled.Center>
-            {this.renderPluginsActionBarItems(ActionsBarPosition.LEFT)}
-            <AudioCaptionsButtonContainer />
-            <AudioControlsContainer />
-            {shouldShowVideoButton && enableVideo
-              ? (
-                <JoinVideoOptionsContainer />
-              )
-              : null}
-            {shouldShowPresentationButton && (
-              <ScreenshareButtonContainer {...{
-                amIPresenter,
-                isMeteorConnected,
+          <div>
+            <ProgressBarTimeline markers={[10, 25, 40]} durationInMinutes={1} onComplete={handleComplete} onMarkerReached={handleMarkerReached} />
+            <Styled.ActionsBar
+              ref={this.actionsBarRef}
+              style={{
+                height: actionsBarStyle.innerHeight,
               }}
-              />
-            )}
-            {this.renderReactionsButton()}
-            <RaiseHandButtonContainer />
-            {this.renderPluginsActionBarItems(ActionsBarPosition.RIGHT)}
-          </Styled.Center>
-          <Styled.Right>
-            {shouldShowPresentationButton && shouldShowOptionsButton
-              ? (
-                <PresentationOptionsContainer
-                  presentationIsOpen={presentationIsOpen}
-                  setPresentationIsOpen={setPresentationIsOpen}
-                  layoutContextDispatch={layoutContextDispatch}
-                  hasPresentation={isThereCurrentPresentation}
-                  hasExternalVideo={isSharingVideo}
-                  hasScreenshare={hasScreenshare}
-                  hasPinnedSharedNotes={isSharedNotesPinned}
-                  hasGenericContent={hasGenericContent}
-                  hasCameraAsContent={hasCameraAsContent}
+            >
+
+              <Styled.Left>
+                <ActionsDropdown {...{
+                  amIPresenter,
+                  amIModerator,
+                  isPollingEnabled,
+                  allowExternalVideo,
+                  intl,
+                  isSharingVideo,
+                  stopExternalVideoShare,
+                  isTimerActive,
+                  isTimerEnabled,
+                  isMeteorConnected,
+                  setMeetingLayout,
+                  setPushLayout,
+                  presentationIsOpen,
+                  showPushLayout,
+                  hasCameraAsContent,
+                  setPresentationFitToWidth,
+                }}
                 />
-              )
-              : null}
-          </Styled.Right>
-        </Styled.ActionsBar>
-      </Styled.ActionsBarWrapper>
+              </Styled.Left>
+              <Styled.Center>
+                {this.renderPluginsActionBarItems(ActionsBarPosition.LEFT)}
+                <AudioCaptionsButtonContainer />
+                <AudioControlsContainer />
+                {shouldShowVideoButton && enableVideo
+                  ? (
+                    <JoinVideoOptionsContainer />
+                  )
+                  : null}
+                {shouldShowPresentationButton && (
+                  <ScreenshareButtonContainer
+                    amIPresenter={amIPresenter}
+                    isMeteorConnected={isMeteorConnected}
+                  />
+                )}
+                {this.renderReactionsButton()}
+                <RaiseHandButtonContainer />
+                {this.renderPluginsActionBarItems(ActionsBarPosition.RIGHT)}
+              </Styled.Center>
+              <Styled.Right>
+                {shouldShowPresentationButton && shouldShowOptionsButton
+                  ? (
+                    <PresentationOptionsContainer
+                      presentationIsOpen={presentationIsOpen}
+                      setPresentationIsOpen={setPresentationIsOpen}
+                      layoutContextDispatch={layoutContextDispatch}
+                      hasPresentation={isThereCurrentPresentation}
+                      hasExternalVideo={isSharingVideo}
+                      hasScreenshare={hasScreenshare}
+                      hasPinnedSharedNotes={isSharedNotesPinned}
+                      hasGenericContent={hasGenericContent}
+                      hasCameraAsContent={hasCameraAsContent}
+                    />
+                  )
+                  : null}
+              </Styled.Right>
+            </Styled.ActionsBar>
+          </div>
+
+        </Styled.ActionsBarWrapper>
+      </>
+
     );
   }
 }
