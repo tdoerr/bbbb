@@ -136,7 +136,7 @@ class ActionsBar extends PureComponent {
           aria-hidden={ariaHidden}
           style={{
             position: 'absolute',
-            top: actionsBarStyle.top - 70,
+            top: actionsBarStyle.top - 40,
             left: actionsBarStyle.left,
             height: actionsBarStyle.height,
             width: actionsBarStyle.width,

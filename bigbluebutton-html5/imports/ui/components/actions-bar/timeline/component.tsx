@@ -1,22 +1,23 @@
-
-
-
-
 import React, { useState, useEffect } from 'react';
 import { Timeline, Progress, Marker } from './styles';
 import ConfirmationModal from '../../common/modal/confirmation/component';
-import { useIntl } from 'react-intl';
+import { startWatching } from '../../external-video-player/external-video-player-graphql/modal/component';
+import { useMutation } from '@apollo/client';
+import { EXTERNAL_VIDEO_START } from '../../external-video-player/mutations';
+import { EventList, MarkerEvent } from './types'
 
-const resourceData = {
+const resourceData: EventList = {
     meeting_time: 3,
-    resources: [
+    events: [
         {
-            resource_type: 1,
+            eventId: 1,
+            event_type: 1,
             external_video_link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
             timestamp: 0.5,
         },
         {
-            resource_type: 2,
+            eventId: 2,
+            event_type: 2,
             is_anonymous: false,
             question: 'What is your favorite color?',
             is_multiple_response: false,
@@ -24,12 +25,14 @@ const resourceData = {
             timestamp: 1,
         },
         {
-            resource_type: 3,
+            eventId: 3,
+            event_type: 3,
             text: 'Here is a plain text resource.',
             timestamp: 1.5,
         },
         {
-            resource_type: 2,
+            eventId: 4,
+            event_type: 2,
             is_anonymous: true,
             question: 'What are your hobbies?',
             is_multiple_response: true,
@@ -43,6 +46,8 @@ const ProgressBarTimeline = ({
     onMarkerReached,
     onComplete,
 }) => {
+    const [startExternalVideo] = useMutation(EXTERNAL_VIDEO_START);
+    const [currentReachedEventId, setCurrentReachedEventId] = useState<number>()
     const totalSeconds = resourceData.meeting_time * 60;
     const [elapsedSeconds, setElapsedSeconds] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
@@ -50,14 +55,12 @@ const ProgressBarTimeline = ({
     const [isOpen, setIsOpen] = useState(false);
     const [modalTitle, setModalTitle] = useState('dds');
     const [modalDescription, setModalDescription] = useState('dds');
-    const [markerPositions, setMarkerPositions] = useState(
-        resourceData.resources.map((resource) => ({
-            timestamp: resource.timestamp * 60,
-            resource,
+    const [markerPositions, setMarkerPositions] = useState<MarkerEvent[]>(
+        resourceData.events.map((event) => ({
+            timestamp: event.timestamp * 60,
+            event,
         }))
     );
-    const intl = useIntl();
-
 
     const getMarkerColor = (type) => {
         switch (type) {
@@ -81,16 +84,13 @@ const ProgressBarTimeline = ({
             interval = setInterval(() => {
                 setElapsedSeconds((prev) => {
                     const nextTime = prev + 1;
-
                     markerPositions.forEach((marker) => {
                         if (nextTime === marker.timestamp && !reachedMarkers.has(marker.timestamp)) {
                             setReachedMarkers((prevMarkers) => new Set(prevMarkers).add(marker.timestamp));
-
-
-                            const { resource_type, question, text } = marker.resource;
-                            setModalTitle(`Resource Type: ${resource_type}`);
+                            const { eventId, event_type, question, text } = marker.event;
+                            setCurrentReachedEventId(eventId)
+                            setModalTitle(`Resource Type: ${event_type}`);
                             setModalDescription(question || text || 'External video available.');
-
                             setIsOpen(true);
                             setIsPlaying(false);
                             if (onMarkerReached) onMarkerReached(marker.timestamp);
@@ -112,22 +112,11 @@ const ProgressBarTimeline = ({
     }, [isPlaying, markerPositions, reachedMarkers, totalSeconds, onMarkerReached, onComplete]);
 
     useEffect(() => {
-        const handleBackdrop = () => {
-            const backdrop = document.querySelector('.kUuWWa');
-            if (!isOpen && backdrop) {
-                backdrop.remove();
-            }
-        };
+        if (!isOpen) {
+            togglePlayPause()
+        }
+    }, [isOpen])
 
-
-        handleBackdrop();
-
-
-        const observer = new MutationObserver(handleBackdrop);
-        observer.observe(document.body, { childList: true, subtree: true });
-
-        return () => observer.disconnect();
-    }, [isOpen]);
 
     const jumpToNextMarker = () => {
         setIsOpen(false);
@@ -148,10 +137,6 @@ const ProgressBarTimeline = ({
         setIsPlaying((prev) => !prev);
     };
 
-    const handleCloseModal = () => {
-        setIsOpen(false);
-        togglePlayPause();
-    };
 
     const handleDragStart = (e, index) => {
         e.dataTransfer.setData('markerIndex', index);
@@ -165,7 +150,9 @@ const ProgressBarTimeline = ({
         e.preventDefault();
         const markerIndex = e.dataTransfer.getData('markerIndex');
         const timelineRect = e.currentTarget.getBoundingClientRect();
-        const newTimestamp = ((e.clientX - timelineRect.left) / timelineRect.width) * totalSeconds;
+        const newTimestamp = Math.round(
+            ((e.clientX - timelineRect.left) / timelineRect.width) * totalSeconds
+        );
 
         setMarkerPositions((prevPositions) => {
             const updatedPositions = [...prevPositions];
@@ -177,24 +164,33 @@ const ProgressBarTimeline = ({
         });
     };
 
+    const onModalConfirm = () => {
+        setIsOpen(false)
+        const event = resourceData.events[currentReachedEventId! - 1]
+        if (event.event_type === 1) {
+            startWatching(event.external_video_link!, startExternalVideo)
+        }
 
+    }
     const progressPercentage = (elapsedSeconds / totalSeconds) * 100;
 
     return (
         <>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <ConfirmationModal
-                    intl={intl}
-                    isOpen={isOpen}
-                    onRequestClose={handleCloseModal}
-                    onConfirm={jumpToNextMarker}
-                    title={modalTitle}
-                    description={modalDescription}
-                    confirmButtonColor="primary"
-                    confirmButtonLabel="Next"
-                    cancelButtonLabel="Dismiss"
-                />
-
+                {isOpen && (
+                    <ConfirmationModal
+                        isOpen={isOpen}
+                        onRequestClose={() => setIsOpen(false)}
+                        onConfirm={onModalConfirm}
+                        setIsOpen={setIsOpen}
+                        title={modalTitle}
+                        description={modalDescription}
+                        confirmButtonColor="primary"
+                        confirmButtonLabel="Next"
+                        priority="low"
+                        cancelButtonLabel="Dismiss"
+                    />
+                )}
                 <Timeline
                     style={{ flex: 1 }}
                     onDragOver={handleDragOver}
@@ -211,16 +207,13 @@ const ProgressBarTimeline = ({
                                 onDragStart={(e) => handleDragStart(e, index)}
                                 style={{
                                     left: `${markerPosition}%`,
-                                    backgroundColor: getMarkerColor(marker.resource.resource_type),
+                                    backgroundColor: getMarkerColor(marker.event.event_type),
                                 }}
                             />
                         );
                     })}
                 </Timeline>
-
-
                 <div style={{ display: 'flex', gap: '10px' }}>
-
                     <button
                         onClick={jumpToPreviousMarker}
                         aria-label="Back"
@@ -241,8 +234,6 @@ const ProgressBarTimeline = ({
                             <path d="M10 17l-5-5 5-5v10zm5 0l-5-5 5-5v10z" />
                         </svg>
                     </button>
-
-
                     <button onClick={togglePlayPause} aria-label={isPlaying ? 'Pause' : 'Play'} style={iconButtonStyle}>
                         {isPlaying ? (
                             <svg
@@ -266,8 +257,6 @@ const ProgressBarTimeline = ({
                             </svg>
                         )}
                     </button>
-
-
                     <button
                         onClick={jumpToNextMarker}
                         aria-label="Forward"

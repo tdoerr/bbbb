@@ -192,6 +192,19 @@ class ActionsDropdown extends PureComponent {
 
     const actions = [];
 
+    {/** if (amIModerator) {
+      actions.push({
+        icon: 'fit_to_width',
+        dataTest: 'timeline',
+        label: 'Timeline',
+        key: 'timeline-action',
+        onClick: () => {
+          console.log('test')
+        }
+      })
+    }
+*/}
+
     if (amIPresenter && !isPresentationManagementDisabled && isPresentationEnabled) {
       if (presentations && presentations.length > 1) {
         actions.push({
