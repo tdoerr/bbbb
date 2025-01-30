@@ -12,6 +12,11 @@ import { ACTIONS, PANELS } from '../../layout/enums';
 import Session from '/imports/ui/services/storage/in-memory';
 import { textToMarkdown } from '../../chat/chat-graphql/chat-message-form/service';
 import { CHAT_SEND_MESSAGE } from '../../chat/chat-graphql/chat-message-form/mutations';
+import useDeduplicatedSubscription from '/imports/ui/core/hooks/useDeduplicatedSubscription';
+import { PROCESSED_PRESENTATIONS_SUBSCRIPTION } from '../../whiteboard/queries';
+import { PRESENTATION_SET_CURRENT } from '../../presentation/mutations';
+import { activateTimer_ } from '../actions-dropdown/container';
+import { TIMER_ACTIVATE, TIMER_SET_TIME, TIMER_START, TIMER_SWITCH_MODE } from '../../timer/mutations';
 
 const resourceData: EventList = {
     meeting_time: 3,
@@ -46,6 +51,18 @@ const resourceData: EventList = {
             answers: ['Reading', 'Swimming', 'Gardening'],
             timestamp: 2,
         },
+        {
+            eventId: 5,
+            event_type: 4,
+            presentation_name: "The_application_of_games_theor.pdf",
+            timestamp: 2.5,
+        },
+        {
+            eventId: 6,
+            event_type: 5,
+            duration: 2,
+            timestamp: 2.8,
+        },
     ],
 };
 
@@ -57,6 +74,16 @@ const ProgressBarTimeline = ({
     const [startExternalVideo] = useMutation(EXTERNAL_VIDEO_START);
     const [createPoll] = useMutation(POLL_CREATE);
     const [chatSendMessage] = useMutation(CHAT_SEND_MESSAGE);
+    const { data: presentationData } = useDeduplicatedSubscription(
+        PROCESSED_PRESENTATIONS_SUBSCRIPTION,
+    );
+    const [timerActivate] = useMutation(TIMER_ACTIVATE);
+    const presentations = presentationData?.pres_presentation || [];
+    const [presentationSetCurrent] = useMutation(PRESENTATION_SET_CURRENT);
+    const setPresentation = (presentationId: string) => {
+        presentationSetCurrent({ variables: { presentationId } });
+    };
+
     //@ts-ignore
     const CHAT_CONFIG = window.meetingClientSettings.public.chat;
     const PUBLIC_CHAT_KEY = CHAT_CONFIG.public_id;
@@ -69,6 +96,9 @@ const ProgressBarTimeline = ({
     const [modalTitle, setModalTitle] = useState('dds');
     const [modalDescription, setModalDescription] = useState('dds');
     const PUBLIC_GROUP_CHAT_ID = CHAT_CONFIG.public_group_id;
+    const [timerStart] = useMutation(TIMER_START);
+    const [timerSwitchMode] = useMutation(TIMER_SWITCH_MODE);
+    const [timerSetTime] = useMutation(TIMER_SET_TIME);
     const [markerPositions, setMarkerPositions] = useState<MarkerEvent[]>(
         resourceData.events.map((event) => ({
             timestamp: event.timestamp * 60,
@@ -212,6 +242,11 @@ const ProgressBarTimeline = ({
             })
                 .then((response: any) => console.log("Auto message sent:", response))
                 .catch((error: any) => console.error("Auto message error:", error));
+        } else if (event.event_type === 4) {
+            const presentation = presentations.find((p) => p.name === event.presentation_name)
+            setPresentation(presentation.presentationId)
+        } else if (event.event_type === 5) {
+            activateTimer_(timerActivate, dispatch, event.duration, timerStart, timerSwitchMode, timerSetTime)
         }
 
     }

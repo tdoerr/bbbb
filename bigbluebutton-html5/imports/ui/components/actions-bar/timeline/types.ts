@@ -1,6 +1,6 @@
 export type EventList = {
     meeting_time: number;
-    events: (PlayVideoEvent | StarPollEvent | SendTextEvent)[];
+    events: (PlayVideoEvent | StarPollEvent | SendTextEvent | SetPresentationEvent)[];
 };
 
 type EventBase = {
@@ -24,6 +24,16 @@ export type StarPollEvent = EventBase & {
 export type SendTextEvent = EventBase & {
     event_type: 3;
     text: string; 
+};
+
+export type SetPresentationEvent = EventBase & {
+    event_type: 4;
+    presentation_name: string; 
+};
+
+export type SetTimerEvent = EventBase & {
+    event_type: 5;
+    duration: number; 
 };
 
 export type MarkerEvent = {
