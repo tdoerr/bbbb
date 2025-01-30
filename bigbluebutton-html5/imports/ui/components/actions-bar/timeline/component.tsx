@@ -5,6 +5,13 @@ import { startWatching } from '../../external-video-player/external-video-player
 import { useMutation } from '@apollo/client';
 import { EXTERNAL_VIDEO_START } from '../../external-video-player/mutations';
 import { EventList, MarkerEvent } from './types'
+import { startPoll } from '../../poll/components/StartPollButton';
+import { POLL_CREATE } from '../../poll/mutations';
+import { layoutDispatch } from '../../layout/context';
+import { ACTIONS, PANELS } from '../../layout/enums';
+import Session from '/imports/ui/services/storage/in-memory';
+import { textToMarkdown } from '../../chat/chat-graphql/chat-message-form/service';
+import { CHAT_SEND_MESSAGE } from '../../chat/chat-graphql/chat-message-form/mutations';
 
 const resourceData: EventList = {
     meeting_time: 3,
@@ -46,7 +53,13 @@ const ProgressBarTimeline = ({
     onMarkerReached,
     onComplete,
 }) => {
+    const dispatch = layoutDispatch()
     const [startExternalVideo] = useMutation(EXTERNAL_VIDEO_START);
+    const [createPoll] = useMutation(POLL_CREATE);
+    const [chatSendMessage] = useMutation(CHAT_SEND_MESSAGE);
+    //@ts-ignore
+    const CHAT_CONFIG = window.meetingClientSettings.public.chat;
+    const PUBLIC_CHAT_KEY = CHAT_CONFIG.public_id;
     const [currentReachedEventId, setCurrentReachedEventId] = useState<number>()
     const totalSeconds = resourceData.meeting_time * 60;
     const [elapsedSeconds, setElapsedSeconds] = useState(0);
@@ -55,6 +68,7 @@ const ProgressBarTimeline = ({
     const [isOpen, setIsOpen] = useState(false);
     const [modalTitle, setModalTitle] = useState('dds');
     const [modalDescription, setModalDescription] = useState('dds');
+    const PUBLIC_GROUP_CHAT_ID = CHAT_CONFIG.public_group_id;
     const [markerPositions, setMarkerPositions] = useState<MarkerEvent[]>(
         resourceData.events.map((event) => ({
             timestamp: event.timestamp * 60,
@@ -96,7 +110,6 @@ const ProgressBarTimeline = ({
                             if (onMarkerReached) onMarkerReached(marker.timestamp);
                         }
                     });
-
                     if (nextTime >= totalSeconds) {
                         clearInterval(interval);
                         if (onComplete) onComplete();
@@ -169,6 +182,36 @@ const ProgressBarTimeline = ({
         const event = resourceData.events[currentReachedEventId! - 1]
         if (event.event_type === 1) {
             startWatching(event.external_video_link!, startExternalVideo)
+        } else if (event.event_type === 2) {
+            startPoll('CUSTOM',
+                event.is_anonymous,
+                event.question,
+                event.is_multiple_response,
+                createPoll,
+                true,
+                PUBLIC_CHAT_KEY,
+                event.answers
+            );
+            dispatch({
+                type: ACTIONS.SET_SIDEBAR_CONTENT_IS_OPEN,
+                value: true,
+            });
+            dispatch({
+                type: ACTIONS.SET_SIDEBAR_CONTENT_PANEL,
+                value: PANELS.POLL,
+            });
+            Session.setItem('forcePollOpen', true);
+            Session.setItem('pollInitiated', true);
+        } else if (event.event_type === 3) {
+            chatSendMessage({
+                variables: {
+                    chatMessageInMarkdownFormat: textToMarkdown(event.text),
+                    chatId: PUBLIC_GROUP_CHAT_ID,
+                    replyToMessageId: null,
+                },
+            })
+                .then((response: any) => console.log("Auto message sent:", response))
+                .catch((error: any) => console.error("Auto message error:", error));
         }
 
     }
