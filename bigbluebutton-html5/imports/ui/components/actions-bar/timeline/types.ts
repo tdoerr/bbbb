@@ -38,5 +38,5 @@ export type SetTimerEvent = EventBase & {
 
 export type MarkerEvent = {
     timestamp: number, 
-    event: (PlayVideoEvent | StarPollEvent | SendTextEvent);
+    event: (PlayVideoEvent | StarPollEvent | SendTextEvent | SetPresentationEvent |SetTimerEvent);
 }

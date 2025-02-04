@@ -17,59 +17,14 @@ import { PROCESSED_PRESENTATIONS_SUBSCRIPTION } from '../../whiteboard/queries';
 import { PRESENTATION_SET_CURRENT } from '../../presentation/mutations';
 import { activateTimer_ } from '../actions-dropdown/container';
 import { TIMER_ACTIVATE, TIMER_SET_TIME, TIMER_START, TIMER_SWITCH_MODE } from '../../timer/mutations';
+import { eventBus } from "../../../../utils/eventBus";
 
-const resourceData: EventList = {
-    meeting_time: 3,
-    events: [
-        {
-            eventId: 1,
-            event_type: 1,
-            external_video_link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-            timestamp: 0.5,
-        },
-        {
-            eventId: 2,
-            event_type: 2,
-            is_anonymous: false,
-            question: 'What is your favorite color?',
-            is_multiple_response: false,
-            answers: ['Red', 'Green', 'Blue'],
-            timestamp: 1,
-        },
-        {
-            eventId: 3,
-            event_type: 3,
-            text: 'Here is a plain text resource.',
-            timestamp: 1.5,
-        },
-        {
-            eventId: 4,
-            event_type: 2,
-            is_anonymous: true,
-            question: 'What are your hobbies?',
-            is_multiple_response: true,
-            answers: ['Reading', 'Swimming', 'Gardening'],
-            timestamp: 2,
-        },
-        {
-            eventId: 5,
-            event_type: 4,
-            presentation_name: "The_application_of_games_theor.pdf",
-            timestamp: 2.5,
-        },
-        {
-            eventId: 6,
-            event_type: 5,
-            duration: 2,
-            timestamp: 2.8,
-        },
-    ],
-};
+type ProgressBarTimelineProps = {
+    eventsData: EventList;
+}
 
-const ProgressBarTimeline = ({
-    onMarkerReached,
-    onComplete,
-}) => {
+const ProgressBarTimeline = ({ eventsData }: ProgressBarTimelineProps) => {
+    console.log(eventsData)
     const dispatch = layoutDispatch()
     const [startExternalVideo] = useMutation(EXTERNAL_VIDEO_START);
     const [createPoll] = useMutation(POLL_CREATE);
@@ -88,7 +43,7 @@ const ProgressBarTimeline = ({
     const CHAT_CONFIG = window.meetingClientSettings.public.chat;
     const PUBLIC_CHAT_KEY = CHAT_CONFIG.public_id;
     const [currentReachedEventId, setCurrentReachedEventId] = useState<number>()
-    const totalSeconds = resourceData.meeting_time * 60;
+    const totalSeconds = eventsData.meeting_time * 60;
     const [elapsedSeconds, setElapsedSeconds] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
     const [reachedMarkers, setReachedMarkers] = useState(new Set());
@@ -100,7 +55,7 @@ const ProgressBarTimeline = ({
     const [timerSwitchMode] = useMutation(TIMER_SWITCH_MODE);
     const [timerSetTime] = useMutation(TIMER_SET_TIME);
     const [markerPositions, setMarkerPositions] = useState<MarkerEvent[]>(
-        resourceData.events.map((event) => ({
+        eventsData.events.map((event) => ({
             timestamp: event.timestamp * 60,
             event,
         }))
@@ -123,7 +78,7 @@ const ProgressBarTimeline = ({
     const hasPreviousMarker = markerPositions.some((marker) => marker.timestamp < elapsedSeconds);
 
     useEffect(() => {
-        let interval = null;
+        let interval: number
         if (isPlaying) {
             interval = setInterval(() => {
                 setElapsedSeconds((prev) => {
@@ -137,12 +92,10 @@ const ProgressBarTimeline = ({
                             setModalDescription(question || text || 'External video available.');
                             setIsOpen(true);
                             setIsPlaying(false);
-                            if (onMarkerReached) onMarkerReached(marker.timestamp);
                         }
                     });
                     if (nextTime >= totalSeconds) {
                         clearInterval(interval);
-                        if (onComplete) onComplete();
                         return totalSeconds;
                     }
 
@@ -152,14 +105,13 @@ const ProgressBarTimeline = ({
         }
 
         return () => clearInterval(interval);
-    }, [isPlaying, markerPositions, reachedMarkers, totalSeconds, onMarkerReached, onComplete]);
+    }, [isPlaying, markerPositions, reachedMarkers, totalSeconds]);
 
     useEffect(() => {
         if (!isOpen) {
             togglePlayPause()
         }
     }, [isOpen])
-
 
     const jumpToNextMarker = () => {
         setIsOpen(false);
@@ -209,7 +161,7 @@ const ProgressBarTimeline = ({
 
     const onModalConfirm = () => {
         setIsOpen(false)
-        const event = resourceData.events[currentReachedEventId! - 1]
+        const event = eventsData.events[currentReachedEventId! - 1]
         if (event.event_type === 1) {
             startWatching(event.external_video_link!, startExternalVideo)
         } else if (event.event_type === 2) {

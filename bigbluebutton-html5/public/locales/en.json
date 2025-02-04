@@ -1540,5 +1540,16 @@
     "mobileApp.portals.drawerNavigation.button.label": "Portals",
     "mobileApp.portals.addPortalPopup.validation.emptyFields": "Required Fields",
     "mobileApp.portals.addPortalPopup.validation.portalNameAlreadyExists": "Name already in use",
-    "mobileApp.portals.addPortalPopup.validation.urlInvalid": "Error trying to load the page - check URL and network connection"
+    "mobileApp.portals.addPortalPopup.validation.urlInvalid": "Error trying to load the page - check URL and network connection", 
+    "app.timeline.uploadJSON": "Upload JSON file",
+    "app.timeline.uploadError": "Error uploading JSON file",
+    "app.timeline.externalVideo": "External video",
+    "app.timeline.poll": "Poll",
+    "app.timeline.textResource": "Text resource",
+    "app.timeline.presentation": "Presentation",
+    "app.timeline.invalidJSON": "Invalid JSON format. Please check the file.",
+    "app.timeline.invalidFormat": "Invalid timeline format. Please check the file structure.",
+    "app.timeline.jsonLoaded": "JSON file successfully loaded",
+    "app.timeline.jsonLoadedFromStorage": "Timeline restored from storage",
+    "app.timeline.clearTimeline": "Clear timeline"
 }

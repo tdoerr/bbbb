@@ -14,7 +14,7 @@ import { LAYOUT_TYPE } from '../layout/enums';
 import ReactionsButtonContainer from '/imports/ui/components/actions-bar/reactions-button/container';
 import RaiseHandButtonContainer from '/imports/ui/components/actions-bar/raise-hand-button/container';
 import ProgressBarTimeline from './timeline/component'
-import { height } from '@mui/system';
+import { eventBus } from "../../../utils/eventBus";
 
 const intlMessages = defineMessages({
   actionsBarLabel: {
@@ -26,9 +26,25 @@ const intlMessages = defineMessages({
 class ActionsBar extends PureComponent {
   constructor(props) {
     super(props);
+    this.state = {
+      eventsData: undefined,
+    }
 
     this.actionsBarRef = React.createRef();
     this.renderPluginsActionBarItems = this.renderPluginsActionBarItems.bind(this);
+  }
+
+  componentDidMount() {
+    const listener = (updatedData) => {
+      if (updatedData === 'added') {
+        const storedData = sessionStorage.getItem('bbb-timeline-data');
+        this.setState({ eventsData: JSON.parse(storedData) });
+      } else if (updatedData === 'removed') {
+        this.setState({ eventsData: undefined });
+      }
+    }
+    eventBus.on("timelineUpdate", listener);
+    return () => eventBus.off("timelineUpdate", listener);
   }
 
   renderPluginsActionBarItems(position) {
@@ -108,7 +124,7 @@ class ActionsBar extends PureComponent {
       isPresentationEnabled,
       ariaHidden,
     } = this.props;
-
+    const { eventsData } = this.state;
     const Settings = getSettingsSingletonInstance();
     const { selectedLayout } = Settings.application;
     const shouldShowPresentationButton = selectedLayout !== LAYOUT_TYPE.CAMERAS_ONLY
@@ -144,7 +160,7 @@ class ActionsBar extends PureComponent {
           }}
         >
           <div>
-            <ProgressBarTimeline markers={[10, 25, 40]} durationInMinutes={1} onComplete={handleComplete} onMarkerReached={handleMarkerReached} />
+            {eventsData ? <ProgressBarTimeline eventsData={eventsData} /> : null}
             <Styled.ActionsBar
               ref={this.actionsBarRef}
               style={{

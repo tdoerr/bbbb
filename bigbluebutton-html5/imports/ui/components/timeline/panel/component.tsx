@@ -11,11 +11,12 @@ import Styled from './styles';
 import ButtonBase from '/imports/ui/components/common/button/component';
 import Icon from '/imports/ui/components/common/icon/component';
 import { notify } from '/imports/ui/services/notification';
+import { eventBus } from "../../../../utils/eventBus";
 
 import { layoutDispatch } from '../../layout/context';
 import { ACTIONS, PANELS } from '../../layout/enums';
 
-const TIMELINE_STORAGE_KEY = 'bbb-timeline-data';
+export const TIMELINE_STORAGE_KEY = 'bbb-timeline-data';
 
 const intlMessages = defineMessages({
   deactivateTimelineLabel: {
@@ -143,6 +144,7 @@ const TimelinePanel = () => {
       try {
         const parsedData = JSON.parse(storedData);
         setTimelineData(parsedData);
+        eventBus.emit("timelineUpdate", "added")
         notify(intl.formatMessage(intlMessages.jsonLoadedFromStorage), 'info', 'upload');
       } catch (e) {
         console.error('Fehler beim Laden der Timeline-Daten:', e);
@@ -180,6 +182,7 @@ const TimelinePanel = () => {
         setTimelineData(json);
         sessionStorage.setItem(TIMELINE_STORAGE_KEY, JSON.stringify(json));
         notify(intl.formatMessage(intlMessages.jsonLoaded), 'success', 'upload');
+        eventBus.emit("timelineUpdate", "added")
       } catch (error) {
         console.error('JSON Parse Error:', error);
       }
@@ -191,6 +194,7 @@ const TimelinePanel = () => {
   const handleClearTimeline = () => {
     setTimelineData(null);
     sessionStorage.removeItem(TIMELINE_STORAGE_KEY);
+    eventBus.emit("timelineUpdate", "removed")
     notify(intl.formatMessage(intlMessages.clearTimeline), 'info', 'delete');
   };
 
@@ -205,10 +209,10 @@ const TimelinePanel = () => {
       case EventType.EXTERNAL_VIDEO:
         return (
           <Styled.EventContent>
-            <Icon iconName="video"/>
-            <Styled.VideoLink 
-              href={event.external_video_link} 
-              target="_blank" 
+            <Icon iconName="video" />
+            <Styled.VideoLink
+              href={event.external_video_link}
+              target="_blank"
               rel="noopener noreferrer"
             >
               {event.external_video_link}
@@ -219,7 +223,7 @@ const TimelinePanel = () => {
       case EventType.POLL:
         return (
           <Styled.EventContent>
-            <Icon iconName="polling"/>
+            <Icon iconName="polling" />
             <Styled.PollContainer>
               <Styled.PollQuestion>{event.question}</Styled.PollQuestion>
               <Styled.PollDetails>
@@ -238,7 +242,7 @@ const TimelinePanel = () => {
       case EventType.TEXT_RESOURCE:
         return (
           <Styled.EventContent>
-            <Icon iconName="file-text"/>
+            <Icon iconName="file-text" />
             <Styled.TextResource>{event.text}</Styled.TextResource>
           </Styled.EventContent>
         );
@@ -246,7 +250,7 @@ const TimelinePanel = () => {
       case EventType.PRESENTATION:
         return (
           <Styled.EventContent>
-            <Icon iconName="file"/>
+            <Icon iconName="file" />
             <Styled.PresentationFile>
               <span>{event.presentation_name}</span>
             </Styled.PresentationFile>
@@ -267,7 +271,7 @@ const TimelinePanel = () => {
           label: intl.formatMessage(intlMessages.timeline),
         }}
       />
-      
+
       <Styled.TimelineContent>
         <Styled.ButtonGroup>
           <Styled.UploadButton>
@@ -284,7 +288,7 @@ const TimelinePanel = () => {
               label={intl.formatMessage(intlMessages.uploadJSON)}
             />
           </Styled.UploadButton>
-          
+
           <Styled.ActionButton
             color="danger"
             onClick={handleClearTimeline}
@@ -320,7 +324,7 @@ const TimelinePanel = () => {
 
 const TimelinePanelContainer = () => {
   return (
-    <TimelinePanel/>
+    <TimelinePanel />
   );
 };
 
