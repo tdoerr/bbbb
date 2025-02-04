@@ -154,6 +154,7 @@ export const PANELS = {
   TIMER: 'timer',
   WAITING_USERS: 'waiting-users',
   GENERIC_CONTENT_SIDEKICK: 'generic-content-sidekick',
+  TIMELINE: 'timeline',
   NONE: 'none',
   PRIVATE_NOTES: 'private-notes'
 };

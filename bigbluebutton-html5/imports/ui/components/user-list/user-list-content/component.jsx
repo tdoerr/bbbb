@@ -6,6 +6,7 @@ import UserListParticipants from './user-participants/user-list-participants/com
 import ChatList from './user-messages/chat-list/component';
 import UserNotesContainer from '../user-list-graphql/user-list-content/user-notes/component';
 import TimerContainer from './timer/container';
+import TimelineContainer from './timeline/container';
 import GuestPanelOpenerContainer from '../user-list-graphql/user-participants-title/guest-panel-opener/component';
 import UserPollsContainer from './user-polls/container';
 import BreakoutRoomContainer from './breakout-room/container';
@@ -51,6 +52,7 @@ class UserContent extends PureComponent {
             <Styled.List>
               {isChatEnabled ? <ChatList /> : null}
               <UserNotesContainer />
+              <TimelineContainer/>
               {isTimerActive
               && <TimerContainer isModerator={currentUser?.role === ROLE_MODERATOR} />}
               {currentUser?.role === ROLE_MODERATOR ? <GuestPanelOpenerContainer /> : null}
@@ -65,6 +67,7 @@ class UserContent extends PureComponent {
           <>
             {isChatEnabled ? <ChatList /> : null}
             <UserNotesContainer />
+            <TimelineContainer/>
             {isTimerActive && <TimerContainer isModerator={currentUser?.role === ROLE_MODERATOR} />}
             {currentUser?.role === ROLE_MODERATOR ? <GuestPanelOpenerContainer /> : null}
             <UserPollsContainer isPresenter={currentUser?.presenter} />
