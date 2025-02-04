@@ -73,7 +73,8 @@ enum EventType {
   EXTERNAL_VIDEO = 1,
   POLL = 2,
   TEXT_RESOURCE = 3,
-  PRESENTATION = 4
+  PRESENTATION = 4,
+  TIMER = 5
 }
 
 interface TimelineEvent {
@@ -87,6 +88,7 @@ interface TimelineEvent {
   answers?: string[];
   text?: string;
   presentation_name?: string;
+  duration?: number;
 }
 
 interface TimelineData {
@@ -256,6 +258,15 @@ const TimelinePanel = () => {
             </Styled.PresentationFile>
           </Styled.EventContent>
         );
+
+      case EventType.TIMER:
+        return (
+          <Styled.EventContent>
+            <Icon iconName="timer" />
+            <Styled.TextResource>{event.duration}</Styled.TextResource>
+          </Styled.EventContent>
+        );
+
 
       default:
         return null;
