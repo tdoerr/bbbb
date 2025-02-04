@@ -47,6 +47,29 @@ interface ExternalVideoPlayerModalProps {
   isOpen: boolean,
 }
 
+/**
+ * Function for starting an external video. 
+ * Can be called outside the component because it's exported. 
+ * 
+ * @param url 
+ * @param startExternalVideo 
+ */
+export const startWatching = (url: string, startExternalVideo: any) => {
+  let externalVideoUrl = url;
+
+  if (YOUTUBE_SHORTS_REGEX.test(url)) {
+    const shortsUrl = url.replace('shorts/', 'watch?v=');
+    externalVideoUrl = shortsUrl;
+  } else if (PANOPTO_MATCH_URL.test(url)) {
+    const m = url.match(PANOPTO_MATCH_URL);
+    if (m && m.length >= 4) {
+      externalVideoUrl = `https://${m[1]}/Podcast/Social/${m[3]}.mp4`;
+    }
+  }
+
+  startExternalVideo({ variables: { externalVideoUrl } });
+};
+
 const ExternalVideoPlayerModal: React.FC<ExternalVideoPlayerModalProps> = ({
   isOpen,
   setIsOpen,
@@ -59,23 +82,6 @@ const ExternalVideoPlayerModal: React.FC<ExternalVideoPlayerModalProps> = ({
   const { animations } = Settings.application;
   const [videoUrl, setVideoUrl] = React.useState('');
   const [startExternalVideo] = useMutation(EXTERNAL_VIDEO_START);
-
-  const startWatching = (url: string) => {
-    let externalVideoUrl = url;
-
-    if (YOUTUBE_SHORTS_REGEX.test(url)) {
-      const shortsUrl = url.replace('shorts/', 'watch?v=');
-      externalVideoUrl = shortsUrl;
-    } else if (PANOPTO_MATCH_URL.test(url)) {
-      const m = url.match(PANOPTO_MATCH_URL);
-      if (m && m.length >= 4) {
-        externalVideoUrl = `https://${m[1]}/Podcast/Social/${m[3]}.mp4`;
-      }
-    }
-
-    startExternalVideo({ variables: { externalVideoUrl } });
-  };
-
   const valid = isUrlValid(videoUrl);
 
   return (
@@ -122,7 +128,7 @@ const ExternalVideoPlayerModal: React.FC<ExternalVideoPlayerModalProps> = ({
           label={intl.formatMessage(intlMessages.start)}
           disabled={!valid || !videoUrl}
           onClick={() => {
-            startWatching(videoUrl);
+            startWatching(videoUrl, startExternalVideo);
             onRequestClose();
           }}
           data-test="startNewVideo"

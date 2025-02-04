@@ -201,7 +201,7 @@ const NotesContainerGraphql: React.FC<NotesContainerGraphqlProps> = (props) => {
   const shouldShowSharedNotesOnPresentationArea = isGridLayout ? !!pinnedPadData
     && pinnedPadData.sharedNotes[0]?.sharedNotesExtId === NOTES_CONFIG.id
     && isSidebarContentOpen : !!pinnedPadData
-    && pinnedPadData.sharedNotes[0]?.sharedNotesExtId === NOTES_CONFIG.id;
+  && pinnedPadData.sharedNotes[0]?.sharedNotesExtId === NOTES_CONFIG.id;
 
   const [stopExternalVideoShare] = useMutation(EXTERNAL_VIDEO_STOP);
   const isScreenBroadcasting = useIsScreenBroadcasting();

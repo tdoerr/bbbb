@@ -15,11 +15,32 @@ import {
 } from '/imports/ui/components/whiteboard/queries';
 import useDeduplicatedSubscription from '/imports/ui/core/hooks/useDeduplicatedSubscription';
 import { SET_PRESENTER } from '/imports/ui/core/graphql/mutations/userMutations';
-import { TIMER_ACTIVATE, TIMER_DEACTIVATE } from '../../timer/mutations';
+import { TIMER_ACTIVATE, TIMER_DEACTIVATE, TIMER_START, TIMER_SWITCH_MODE, TIMER_SET_TIME } from '../../timer/mutations';
 import Auth from '/imports/ui/services/auth';
 import { PRESENTATION_SET_CURRENT } from '../../presentation/mutations';
 import { useStorageKey } from '/imports/ui/services/storage/hooks';
 import { useMeetingIsBreakout } from '/imports/ui/components/app/service';
+
+export function activateTimer_(timerActivate, layoutContextDispatch, givenTime, timerStart, timerSwitchMode, timerSetTime) {
+  const TIMER_CONFIG = window.meetingClientSettings.public.timer;
+  const MILLI_IN_MINUTE = 60000;
+  const stopwatch = givenTime ? false : true;
+  const running = givenTime ? true : false;
+  const time = givenTime ? givenTime * MILLI_IN_MINUTE : TIMER_CONFIG.time * MILLI_IN_MINUTE;
+  timerActivate({ variables: { stopwatch, running, time } }).then(() => {
+    timerSwitchMode({ variables: { stopwatch: stopwatch } }).then(() => { timerSetTime({ variables: { time: time } }).then(() => { if (givenTime) timerStart() }) })
+  })
+  setTimeout(() => {
+    layoutContextDispatch({
+      type: ACTIONS.SET_SIDEBAR_CONTENT_IS_OPEN,
+      value: true,
+    });
+    layoutContextDispatch({
+      type: ACTIONS.SET_SIDEBAR_CONTENT_PANEL,
+      value: PANELS.TIMER,
+    });
+  }, 500);
+};
 
 const ActionsDropdownContainer = (props) => {
   const sidebarContent = layoutSelectInput((i) => i.sidebarContent);
@@ -30,6 +51,7 @@ const ActionsDropdownContainer = (props) => {
   const isRTL = layoutSelect((i) => i.isRTL);
   const { pluginsExtensibleAreasAggregatedState } = useContext(PluginsContext);
   const meetingIsBreakout = useMeetingIsBreakout();
+  const [timerActivate] = useMutation(TIMER_ACTIVATE);
 
   let actionButtonDropdownItems = [];
   if (pluginsExtensibleAreasAggregatedState.actionButtonDropdownItems) {
@@ -53,7 +75,6 @@ const ActionsDropdownContainer = (props) => {
     && !allowPresentationManagementInBreakouts;
 
   const [setPresenter] = useMutation(SET_PRESENTER);
-  const [timerActivate] = useMutation(TIMER_ACTIVATE);
   const [timerDeactivate] = useMutation(TIMER_DEACTIVATE);
   const [presentationSetCurrent] = useMutation(PRESENTATION_SET_CURRENT);
 
@@ -66,25 +87,8 @@ const ActionsDropdownContainer = (props) => {
   };
 
   const activateTimer = () => {
-    const TIMER_CONFIG = window.meetingClientSettings.public.timer;
-    const MILLI_IN_MINUTE = 60000;
-    const stopwatch = true;
-    const running = false;
-    const time = TIMER_CONFIG.time * MILLI_IN_MINUTE;
-
-    timerActivate({ variables: { stopwatch, running, time } });
-
-    setTimeout(() => {
-      layoutContextDispatch({
-        type: ACTIONS.SET_SIDEBAR_CONTENT_IS_OPEN,
-        value: true,
-      });
-      layoutContextDispatch({
-        type: ACTIONS.SET_SIDEBAR_CONTENT_PANEL,
-        value: PANELS.TIMER,
-      });
-    }, 500);
-  };
+    activateTimer_(timerActivate, layoutContextDispatch)
+  }
 
   const isDropdownOpen = useStorageKey('dropdownOpen');
   const isPresentationEnabled = useIsPresentationEnabled();

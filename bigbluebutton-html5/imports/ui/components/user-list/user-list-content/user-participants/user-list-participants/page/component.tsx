@@ -21,6 +21,7 @@ interface UserListParticipantsContainerProps {
   isLastItem: boolean;
   restOfUsers: number;
   setVisibleUsers: React.Dispatch<React.SetStateAction<{ [key: number]: User[]; }>>;
+  searchedUser: string
 }
 
 interface UsersListParticipantsPage {
@@ -80,6 +81,7 @@ const UserListParticipantsPageContainer: React.FC<UserListParticipantsContainerP
   isLastItem,
   restOfUsers,
   setVisibleUsers,
+  searchedUser
 }) => {
   const offset = index * 50;
   const limit = useRef(50);
@@ -143,7 +145,9 @@ const UserListParticipantsPageContainer: React.FC<UserListParticipantsContainerP
 
   return (
     <UsersListParticipantsPage
-      users={users ?? []}
+      users={searchedUser ? users.filter((user: User) => user.name.trim().toLowerCase().includes(searchedUser))
+        : users
+      }
       meeting={meeting ?? {}}
       currentUser={currentUser ?? {}}
       pageId={pageId}

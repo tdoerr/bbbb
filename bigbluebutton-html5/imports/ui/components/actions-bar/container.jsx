@@ -122,44 +122,47 @@ const ActionsBarContainer = (props) => {
   if (!pinnedPadData) return null;
 
   const isSharedNotesPinnedFromGraphql = !!pinnedPadData
-  && pinnedPadData.sharedNotes[0]?.sharedNotesExtId === NOTES_CONFIG.id;
+    && pinnedPadData.sharedNotes[0]?.sharedNotesExtId === NOTES_CONFIG.id;
 
   const isSharedNotesPinned = isSharedNotesPinnedFromGraphql;
   return (
-    <ActionsBar {
-      ...{
-        ...props,
-        enableVideo: getFromUserSettings('bbb_enable_video', window.meetingClientSettings.public.kurento.enableVideo),
-        multiUserTools: getFromUserSettings('bbb_multi_user_tools', window.meetingClientSettings.public.whiteboard.toolbar.multiUserTools),
-        isReactionsButtonEnabled: isReactionsButtonEnabled(),
-        setPresentationIsOpen: MediaService.setPresentationIsOpen,
-        hasScreenshare: currentMeeting?.componentsFlags?.hasScreenshare ?? false,
-        isMeteorConnected: connected,
-        hasCameraAsContent: currentMeeting?.componentsFlags?.hasCameraAsContent,
-        intl,
-        allowExternalVideo,
-        isPollingEnabled,
-        isPresentationEnabled,
-        currentUser,
-        amIModerator,
-        layoutContextDispatch,
-        actionsBarStyle,
-        amIPresenter,
-        actionBarItems,
-        isThereCurrentPresentation,
-        isSharingVideo,
-        stopExternalVideoShare,
-        isSharedNotesPinned,
-        isTimerActive: currentMeeting.componentsFlags.hasTimer,
-        isTimerEnabled: isTimerFeatureEnabled,
-        hasGenericContent: isThereGenericMainContent,
-        setPushLayout,
-        setMeetingLayout,
-        showPushLayout: showPushLayoutButton && applicationSettings.selectedLayout === 'custom',
-        ariaHidden,
+    <>
+      <ActionsBar {
+        ...{
+          ...props,
+          enableVideo: getFromUserSettings('bbb_enable_video', window.meetingClientSettings.public.kurento.enableVideo),
+          multiUserTools: getFromUserSettings('bbb_multi_user_tools', window.meetingClientSettings.public.whiteboard.toolbar.multiUserTools),
+          isReactionsButtonEnabled: isReactionsButtonEnabled(),
+          setPresentationIsOpen: MediaService.setPresentationIsOpen,
+          hasScreenshare: currentMeeting?.componentsFlags?.hasScreenshare ?? false,
+          isMeteorConnected: connected,
+          hasCameraAsContent: currentMeeting?.componentsFlags?.hasCameraAsContent,
+          intl,
+          allowExternalVideo,
+          isPollingEnabled,
+          isPresentationEnabled,
+          currentUser,
+          amIModerator,
+          layoutContextDispatch,
+          actionsBarStyle,
+          amIPresenter,
+          actionBarItems,
+          isThereCurrentPresentation,
+          isSharingVideo,
+          stopExternalVideoShare,
+          isSharedNotesPinned,
+          isTimerActive: currentMeeting.componentsFlags.hasTimer,
+          isTimerEnabled: isTimerFeatureEnabled,
+          hasGenericContent: isThereGenericMainContent,
+          setPushLayout,
+          setMeetingLayout,
+          showPushLayout: showPushLayoutButton && applicationSettings.selectedLayout === 'custom',
+          ariaHidden,
+        }
       }
-    }
-    />
+      />
+    </>
+
   );
 };
 
