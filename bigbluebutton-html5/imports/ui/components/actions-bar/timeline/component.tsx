@@ -9,15 +9,14 @@ import { startPoll } from '../../poll/components/StartPollButton';
 import { POLL_CREATE } from '../../poll/mutations';
 import { layoutDispatch } from '../../layout/context';
 import { ACTIONS, PANELS } from '../../layout/enums';
-import Session from '/imports/ui/services/storage/in-memory';
+import Session from '../../../services/storage/in-memory'
 import { textToMarkdown } from '../../chat/chat-graphql/chat-message-form/service';
 import { CHAT_SEND_MESSAGE } from '../../chat/chat-graphql/chat-message-form/mutations';
-import useDeduplicatedSubscription from '/imports/ui/core/hooks/useDeduplicatedSubscription';
+import useDeduplicatedSubscription from '../../../core/hooks/useDeduplicatedSubscription';
 import { PROCESSED_PRESENTATIONS_SUBSCRIPTION } from '../../whiteboard/queries';
 import { PRESENTATION_SET_CURRENT } from '../../presentation/mutations';
 import { activateTimer_ } from '../actions-dropdown/container';
 import { TIMER_ACTIVATE, TIMER_SET_TIME, TIMER_START, TIMER_SWITCH_MODE } from '../../timer/mutations';
-import { eventBus } from "../../../../utils/eventBus";
 
 type ProgressBarTimelineProps = {
     eventsData: EventList;
@@ -29,6 +28,7 @@ const ProgressBarTimeline = ({ eventsData }: ProgressBarTimelineProps) => {
     const [startExternalVideo] = useMutation(EXTERNAL_VIDEO_START);
     const [createPoll] = useMutation(POLL_CREATE);
     const [chatSendMessage] = useMutation(CHAT_SEND_MESSAGE);
+    //@ts-ignore
     const { data: presentationData } = useDeduplicatedSubscription(
         PROCESSED_PRESENTATIONS_SUBSCRIPTION,
     );
@@ -47,7 +47,7 @@ const ProgressBarTimeline = ({ eventsData }: ProgressBarTimelineProps) => {
     const [elapsedSeconds, setElapsedSeconds] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
     const [reachedMarkers, setReachedMarkers] = useState(new Set());
-    const [isOpen, setIsOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState<boolean>(false);
     const [modalTitle, setModalTitle] = useState('dds');
     const [modalDescription, setModalDescription] = useState('dds');
     const PUBLIC_GROUP_CHAT_ID = CHAT_CONFIG.public_group_id;
@@ -86,6 +86,7 @@ const ProgressBarTimeline = ({ eventsData }: ProgressBarTimelineProps) => {
                     markerPositions.forEach((marker) => {
                         if (nextTime === marker.timestamp && !reachedMarkers.has(marker.timestamp)) {
                             setReachedMarkers((prevMarkers) => new Set(prevMarkers).add(marker.timestamp));
+                            //@ts-ignore
                             const { eventId, event_type, question, text } = marker.event;
                             setCurrentReachedEventId(eventId)
                             setModalTitle(`Resource Type: ${event_type}`);
@@ -112,6 +113,10 @@ const ProgressBarTimeline = ({ eventsData }: ProgressBarTimelineProps) => {
             togglePlayPause()
         }
     }, [isOpen])
+
+    useEffect(() => {
+        setIsPlaying(false)
+    }, [])
 
     const jumpToNextMarker = () => {
         setIsOpen(false);
