@@ -1,6 +1,6 @@
 export type EventList = {
     meeting_time: number;
-    events: (PlayVideoEvent | StarPollEvent | SendTextEvent | SetPresentationEvent)[];
+    events: (PlayVideoEvent | StarPollEvent | SendTextEvent | SetPresentationEvent | SetTimerEvent)[];
 };
 
 type EventBase = {
