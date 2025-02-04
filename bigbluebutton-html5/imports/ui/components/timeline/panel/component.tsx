@@ -262,8 +262,10 @@ const TimelinePanel = () => {
       case EventType.TIMER:
         return (
           <Styled.EventContent>
-            <Icon iconName="timer" />
-            <Styled.TextResource>{event.duration}</Styled.TextResource>
+            <Icon iconName="time" />
+            <Styled.Timer>
+              {event.duration}
+            </Styled.Timer>
           </Styled.EventContent>
         );
 

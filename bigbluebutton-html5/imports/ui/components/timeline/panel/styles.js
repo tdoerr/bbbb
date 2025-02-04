@@ -147,6 +147,25 @@ const TextResource = styled.div`
   width: 100%;
 `;
 
+const Timer = styled.div`
+  font-size: 1.2em;
+  font-weight: bold;
+  color: ${colorPrimary};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: ${colorGrayLighter};
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  width: fit-content;
+
+  i {
+    margin-right: 0.5rem;
+    font-size: 1.5em;
+    color: ${colorPrimary};
+  }
+`;
+
 const PresentationFile = styled.div`
   display: flex;
   align-items: center;
@@ -240,4 +259,5 @@ export default {
   ErrorMessage,
   ButtonGroup,
   ActionButton,
+  Timer,
 };
