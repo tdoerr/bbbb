@@ -18,65 +18,62 @@ import { PRESENTATION_SET_CURRENT } from '../../presentation/mutations';
 import { activateTimer_ } from '../actions-dropdown/container';
 import { TIMER_ACTIVATE, TIMER_SET_TIME, TIMER_START, TIMER_SWITCH_MODE } from '../../timer/mutations';
 
+/**
+ * The props represent the timline-config-file 
+ */
 type ProgressBarTimelineProps = {
     eventsData: EventList;
 }
 
+/**
+ * This is the implementation of the timeline which appears above the actions-bar. 
+ * 
+ * @param eventsData 
+ * @returns Timline component
+ */
 const ProgressBarTimeline = ({ eventsData }: ProgressBarTimelineProps) => {
-    console.log(eventsData)
+    // #### INIT #### //
     const dispatch = layoutDispatch()
-    const [startExternalVideo] = useMutation(EXTERNAL_VIDEO_START);
-    const [createPoll] = useMutation(POLL_CREATE);
-    const [chatSendMessage] = useMutation(CHAT_SEND_MESSAGE);
     //@ts-ignore
-    const { data: presentationData } = useDeduplicatedSubscription(
-        PROCESSED_PRESENTATIONS_SUBSCRIPTION,
-    );
-    const [timerActivate] = useMutation(TIMER_ACTIVATE);
-    const presentations = presentationData?.pres_presentation || [];
-    const [presentationSetCurrent] = useMutation(PRESENTATION_SET_CURRENT);
-    const setPresentation = (presentationId: string) => {
-        presentationSetCurrent({ variables: { presentationId } });
-    };
-
-    //@ts-ignore
-    const CHAT_CONFIG = window.meetingClientSettings.public.chat;
-    const PUBLIC_CHAT_KEY = CHAT_CONFIG.public_id;
+    const CHAT_CONFIG = window.meetingClientSettings.public.chat
+    const PUBLIC_CHAT_KEY = CHAT_CONFIG.public_id
+    const PUBLIC_GROUP_CHAT_ID = CHAT_CONFIG.public_group_id
     const [currentReachedEventId, setCurrentReachedEventId] = useState<number>()
-    const totalSeconds = eventsData.meeting_time * 60;
-    const [elapsedSeconds, setElapsedSeconds] = useState(0);
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [reachedMarkers, setReachedMarkers] = useState(new Set());
-    const [isOpen, setIsOpen] = useState<boolean>(false);
-    const [modalTitle, setModalTitle] = useState('dds');
-    const [modalDescription, setModalDescription] = useState('dds');
-    const PUBLIC_GROUP_CHAT_ID = CHAT_CONFIG.public_group_id;
-    const [timerStart] = useMutation(TIMER_START);
-    const [timerSwitchMode] = useMutation(TIMER_SWITCH_MODE);
-    const [timerSetTime] = useMutation(TIMER_SET_TIME);
+    const totalSeconds = eventsData.meeting_time * 60
+    const [elapsedSeconds, setElapsedSeconds] = useState<number>(0)
+    const [isPlaying, setIsPlaying] = useState<boolean>(false)
+    const [reachedMarkers, setReachedMarkers] = useState(new Set())
+    const [isOpen, setIsOpen] = useState<boolean>(false)
+    const [modalTitle, setModalTitle] = useState<string>('title')
+    const [modalDescription, setModalDescription] = useState<string>('description')
     const [markerPositions, setMarkerPositions] = useState<MarkerEvent[]>(
         eventsData.events.map((event) => ({
             timestamp: event.timestamp * 60,
             event,
         }))
     );
-
-    const getMarkerColor = (type) => {
-        switch (type) {
-            case 1:
-                return 'red';
-            case 2:
-                return 'blue';
-            case 3:
-                return 'green';
-            default:
-                return 'gray';
-        }
-    };
+    // #### MUTATIONS #### //
+    const [startExternalVideo] = useMutation(EXTERNAL_VIDEO_START)
+    const [createPoll] = useMutation(POLL_CREATE)
+    const [chatSendMessage] = useMutation(CHAT_SEND_MESSAGE)
+    const [timerStart] = useMutation(TIMER_START)
+    const [timerSwitchMode] = useMutation(TIMER_SWITCH_MODE)
+    const [timerSetTime] = useMutation(TIMER_SET_TIME)
+    const [timerActivate] = useMutation(TIMER_ACTIVATE)
+    const [presentationSetCurrent] = useMutation(PRESENTATION_SET_CURRENT)
+    //@ts-ignore
+    const { data: presentationData } = useDeduplicatedSubscription(
+        PROCESSED_PRESENTATIONS_SUBSCRIPTION,
+    );
+    const presentations = presentationData?.pres_presentation || []
+    const setPresentation = (presentationId: string) => {
+        presentationSetCurrent({ variables: { presentationId } })
+    }
 
     const hasNextMarker = markerPositions.some((marker) => marker.timestamp > elapsedSeconds);
     const hasPreviousMarker = markerPositions.some((marker) => marker.timestamp < elapsedSeconds);
 
+    // #### USE-EFFECT-HOOKS #### //
     useEffect(() => {
         let interval: number
         if (isPlaying) {
@@ -87,10 +84,10 @@ const ProgressBarTimeline = ({ eventsData }: ProgressBarTimelineProps) => {
                         if (nextTime === marker.timestamp && !reachedMarkers.has(marker.timestamp)) {
                             setReachedMarkers((prevMarkers) => new Set(prevMarkers).add(marker.timestamp));
                             //@ts-ignore
-                            const { eventId, event_type, question, text } = marker.event;
+                            const { eventId, event_type } = marker.event;
                             setCurrentReachedEventId(eventId)
-                            setModalTitle(`Resource Type: ${event_type}`);
-                            setModalDescription(question || text || 'External video available.');
+                            setModalTitle(`Event triggered - type: ${event_type}`);
+                            setModalDescription(getModalDescription(marker));
                             setIsOpen(true);
                             setIsPlaying(false);
                         }
@@ -99,12 +96,10 @@ const ProgressBarTimeline = ({ eventsData }: ProgressBarTimelineProps) => {
                         clearInterval(interval);
                         return totalSeconds;
                     }
-
                     return nextTime;
                 });
             }, 1000);
         }
-
         return () => clearInterval(interval);
     }, [isPlaying, markerPositions, reachedMarkers, totalSeconds]);
 
@@ -118,6 +113,43 @@ const ProgressBarTimeline = ({ eventsData }: ProgressBarTimelineProps) => {
         setIsPlaying(false)
     }, [])
 
+    // #### SERVICE-FUNCTIONS #### // 
+
+    const getMarkerColor = (type: number) => {
+        switch (type) {
+            case 1:
+                return 'red'
+            case 2:
+                return 'blue'
+            case 3:
+                return 'green'
+            case 4:
+                return 'yellow'
+            case 5:
+                return 'black'
+            default:
+                return 'gray'
+        }
+    }
+
+    const getModalDescription = (marker: MarkerEvent) => {
+        //@ts-ignore
+        const { eventId, event_type, question, text, external_video_link, presentation_name, duration } = marker.event;
+        switch (event_type) {
+            case 1:
+                return `Play video: ${external_video_link}?`
+            case 2:
+                return `Send poll with question: ${question}?`
+            case 3:
+                return `Send this text to public chat: ${text}?`
+            case 4:
+                return `Change presentation to: ${presentation_name}?`
+            case 5:
+                return `Set timer to duration: ${duration}?`
+            default:
+                return ''
+        }
+    }
     const jumpToNextMarker = () => {
         setIsOpen(false);
         const nextMarker = markerPositions.find((marker) => marker.timestamp > elapsedSeconds);
