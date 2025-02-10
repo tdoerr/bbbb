@@ -74,7 +74,8 @@ enum EventType {
   POLL = 2,
   TEXT_RESOURCE = 3,
   PRESENTATION = 4,
-  TIMER = 5
+  TIMER = 5,
+  BREAKOUT = 6,
 }
 
 interface TimelineEvent {
@@ -269,6 +270,15 @@ const TimelinePanel = () => {
           </Styled.EventContent>
         );
 
+      case EventType.BREAKOUT:
+        return (
+          <Styled.EventContent>
+            <Icon iconName="rooms" />
+            <Styled.Timer>
+              {event.duration}
+            </Styled.Timer>
+          </Styled.EventContent>
+        );
 
       default:
         return null;

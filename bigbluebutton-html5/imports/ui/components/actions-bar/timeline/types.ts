@@ -1,6 +1,6 @@
 export type EventList = {
     meeting_time: number;
-    events: (PlayVideoEvent | StarPollEvent | SendTextEvent | SetPresentationEvent | SetTimerEvent)[];
+    events: (PlayVideoEvent | StarPollEvent | SendTextEvent | SetPresentationEvent | SetTimerEvent | SetBreakoutRoomsEvent)[];
 };
 
 type EventBase = {
@@ -36,7 +36,13 @@ export type SetTimerEvent = EventBase & {
     duration: number; 
 };
 
+export type SetBreakoutRoomsEvent = EventBase & {
+    event_type: 6;
+    breakout_duration: number;
+    number_of_groups: number;  
+};
+
 export type MarkerEvent = {
     timestamp: number, 
-    event: (PlayVideoEvent | StarPollEvent | SendTextEvent | SetPresentationEvent |SetTimerEvent);
+    event: (PlayVideoEvent | StarPollEvent | SendTextEvent | SetPresentationEvent | SetTimerEvent | SetBreakoutRoomsEvent);
 }

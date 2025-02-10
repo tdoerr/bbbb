@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Timeline, Progress, Marker } from './styles';
 import ConfirmationModal from '../../common/modal/confirmation/component';
 import { startWatching } from '../../external-video-player/external-video-player-graphql/modal/component';
-import { useMutation } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { EXTERNAL_VIDEO_START } from '../../external-video-player/mutations';
 import { EventList, MarkerEvent } from './types'
 import { startPoll } from '../../poll/components/StartPollButton';
@@ -15,8 +15,14 @@ import { CHAT_SEND_MESSAGE } from '../../chat/chat-graphql/chat-message-form/mut
 import useDeduplicatedSubscription from '../../../core/hooks/useDeduplicatedSubscription';
 import { PROCESSED_PRESENTATIONS_SUBSCRIPTION } from '../../whiteboard/queries';
 import { PRESENTATION_SET_CURRENT } from '../../presentation/mutations';
+import { BREAKOUT_ROOM_CREATE } from '../../breakout-room/mutations';
 import { activateTimer_ } from '../actions-dropdown/container';
 import { TIMER_ACTIVATE, TIMER_SET_TIME, TIMER_START, TIMER_SWITCH_MODE } from '../../timer/mutations';
+import {
+    getUser,
+    getUserResponse,
+} from '../../breakout-room/create-breakout-room/queries';
+import { RoomToWithSettings } from '../../breakout-room/create-breakout-room/room-managment-state/types';
 
 /**
  * The props represent the timline-config-file 
@@ -53,6 +59,7 @@ const ProgressBarTimeline = ({ eventsData }: ProgressBarTimelineProps) => {
         }))
     );
     // #### MUTATIONS #### //
+    const [createBreakoutRoom] = useMutation(BREAKOUT_ROOM_CREATE);
     const [startExternalVideo] = useMutation(EXTERNAL_VIDEO_START)
     const [createPoll] = useMutation(POLL_CREATE)
     const [chatSendMessage] = useMutation(CHAT_SEND_MESSAGE)
@@ -115,26 +122,71 @@ const ProgressBarTimeline = ({ eventsData }: ProgressBarTimelineProps) => {
 
     // #### SERVICE-FUNCTIONS #### // 
 
+    //could be used for setting up the breakout rooms with randomized user order - but for now, it's not needed 
+    const {
+        data: usersData,
+        loading: usersLoading,
+        error: usersError,
+    } = useQuery<getUserResponse>(getUser, {
+        fetchPolicy: 'network-only',
+    });
+
+
+    const generateBreakoutRooms = (numberOfRooms: number, breakoutDuration: number) => {
+        const roomsArray: RoomToWithSettings[] = [];
+        const presentation = presentations[0]
+        for (let i = 0; i < numberOfRooms; i += 1) {
+            const defaultName = `Room ${i + 1}`
+            roomsArray.push({
+                name: defaultName,
+                sequence: i + 1,
+                captureNotesFilename: `${defaultName.replace(/\s/g, '_')}_Notes`,
+                captureSlidesFilename: `${defaultName.replace(/\s/g, '_')}_Slides`,
+                isDefaultName: true,
+                freeJoin: true,
+                shortName: defaultName,
+                users: [],
+                allPages: false,
+                presId: presentation.presentationId,
+            });
+        }
+        createBreakoutRoom(
+            {
+                variables: {
+                    record: true,
+                    captureNotes: false,
+                    captureSlides: false,
+                    durationInMinutes: breakoutDuration,
+                    sendInviteToModerators: true,
+                    rooms: roomsArray,
+                },
+            },
+        );
+        console.log(roomsArray)
+    }
+
     const getMarkerColor = (type: number) => {
         switch (type) {
             case 1:
-                return 'red'
+                return 'darkred';
             case 2:
-                return 'blue'
+                return 'royalblue';
             case 3:
-                return 'green'
+                return 'darkgreen';
             case 4:
-                return 'yellow'
+                return 'goldenrod';
             case 5:
-                return 'black'
+                return 'black';
+            case 6:
+                return 'purple';
             default:
-                return 'gray'
+                return 'dimgray';
         }
     }
 
     const getModalDescription = (marker: MarkerEvent) => {
         //@ts-ignore
-        const { eventId, event_type, question, text, external_video_link, presentation_name, duration } = marker.event;
+        const { eventId, event_type, question, text, external_video_link, presentation_name, duration, number_of_groups, breakout_duration } = marker.event;
         switch (event_type) {
             case 1:
                 return `Play video: ${external_video_link}?`
@@ -146,6 +198,8 @@ const ProgressBarTimeline = ({ eventsData }: ProgressBarTimelineProps) => {
                 return `Change presentation to: ${presentation_name}?`
             case 5:
                 return `Set timer to duration: ${duration}?`
+            case 6:
+                return `Create ${number_of_groups} breakout-rooms for ${breakout_duration} minutes?`
             default:
                 return ''
         }
@@ -236,6 +290,8 @@ const ProgressBarTimeline = ({ eventsData }: ProgressBarTimelineProps) => {
             setPresentation(presentation.presentationId)
         } else if (event.event_type === 5) {
             activateTimer_(timerActivate, dispatch, event.duration, timerStart, timerSwitchMode, timerSetTime)
+        } else if (event.event_type === 6) {
+            generateBreakoutRooms(event.number_of_groups, event.breakout_duration)
         }
 
     }
