@@ -148,22 +148,51 @@ const TextResource = styled.div`
 `;
 
 const Timer = styled.div`
-  font-size: 1.2em;
-  font-weight: bold;
-  color: ${colorPrimary};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: ${colorGrayLighter};
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  width: fit-content;
+display: flex;
+align-items: center;
+gap: 0.5rem;
+width: 100%;
 
-  i {
-    margin-right: 0.5rem;
-    font-size: 1.5em;
-    color: ${colorPrimary};
-  }
+span {
+  flex-grow: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+&:after {
+  content: 'TIMER';
+  font-size: 0.7em;
+  background: ${colorPrimary}20;
+  color: ${colorPrimary};
+  padding: 2px 6px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+`;
+
+const Breakout = styled.div`
+display: flex;
+align-items: center;
+gap: 0.5rem;
+width: 100%;
+
+span {
+  flex-grow: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+&:after {
+  content: 'BREAKOUT';
+  font-size: 0.7em;
+  background: ${colorPrimary}20;
+  color: ${colorPrimary};
+  padding: 2px 6px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
 `;
 
 const PresentationFile = styled.div`
@@ -260,4 +289,5 @@ export default {
   ButtonGroup,
   ActionButton,
   Timer,
+  Breakout,
 };

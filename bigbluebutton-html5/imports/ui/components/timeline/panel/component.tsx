@@ -90,6 +90,8 @@ interface TimelineEvent {
   text?: string;
   presentation_name?: string;
   duration?: number;
+  number_of_groups?: number,
+  breakout_duration?: number
 }
 
 interface TimelineData {
@@ -245,7 +247,7 @@ const TimelinePanel = () => {
       case EventType.TEXT_RESOURCE:
         return (
           <Styled.EventContent>
-            <Icon iconName="file-text" />
+            <Icon iconName="group_chat" />
             <Styled.TextResource>{event.text}</Styled.TextResource>
           </Styled.EventContent>
         );
@@ -265,7 +267,7 @@ const TimelinePanel = () => {
           <Styled.EventContent>
             <Icon iconName="time" />
             <Styled.Timer>
-              {event.duration}
+              <span>{event.duration}</span>
             </Styled.Timer>
           </Styled.EventContent>
         );
@@ -274,9 +276,9 @@ const TimelinePanel = () => {
         return (
           <Styled.EventContent>
             <Icon iconName="rooms" />
-            <Styled.Timer>
-              {event.duration}
-            </Styled.Timer>
+            <Styled.Breakout>
+              <span> Duration: {event.breakout_duration}, number: {event.number_of_groups}</span>
+            </Styled.Breakout>
           </Styled.EventContent>
         );
 
