@@ -208,7 +208,7 @@ const ProgressBarTimeline = ({ eventsData }: ProgressBarTimelineProps) => {
         setIsOpen(false);
         const nextMarker = markerPositions.find((marker) => marker.timestamp > elapsedSeconds);
         if (nextMarker) {
-            setElapsedSeconds(nextMarker.timestamp);
+            setElapsedSeconds(nextMarker.timestamp - 1);
         }
     };
 
